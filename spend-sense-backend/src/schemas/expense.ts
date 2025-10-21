@@ -13,9 +13,10 @@ const expenseInputSchema = z.strictObject({
   categoryId: z
     .string()
     .refine((val) => isValidObjectId(val), "Invalid Category ID"),
-  date: z.date({
-    error: (issue) => (issue.input === undefined ? "Required" : "Invalid date"),
-  }),
+  date: z
+    .any()
+    .refine((val) => !isNaN(Date.parse(val)), { message: "Invalid date" })
+    .transform((val) => new Date(val)),
   userId: z.string().refine((val) => isValidObjectId(val), "Invalid User ID"),
 });
 
