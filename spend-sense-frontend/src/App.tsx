@@ -1,22 +1,26 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { AddExpense, Dashboard, EditExpense, SignIn, SignUp } from "./pages";
 import { MainLayout } from "./layouts";
 
-const App = () => {
+export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/signIn" element={<SignIn />} />
-        <Route path="/signUp" element={<SignUp />} />
-        <Route path="/" element={<MainLayout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="editExpense" element={<EditExpense />} />
-          <Route path="addExpense" element={<AddExpense />} />
-        </Route>
-        <Route path="*" element={<Navigate to="/signIn" replace />} />
-      </Routes>
-    </BrowserRouter>
-  );
-};
+    <Routes>
+      {/* redirect root to signIn */}
+      <Route path="/" element={<Navigate to="/signIn" replace />} />
 
-export default App;
+      {/* auth routes */}
+      <Route path="/signIn" element={<SignIn />} />
+      <Route path="/signUp" element={<SignUp />} />
+
+      {/* app routes under /app */}
+      <Route path="/app" element={<MainLayout />}>
+        <Route index element={<Dashboard />} />
+        <Route path="editExpense" element={<EditExpense />} />
+        <Route path="addExpense" element={<AddExpense />} />
+      </Route>
+
+      {/* fallback */}
+      <Route path="*" element={<Navigate to="/signIn" replace />} />
+    </Routes>
+  );
+}
