@@ -1,13 +1,9 @@
 import mongoose from "mongoose";
 
-try {
-  const mongoURI = process.env.MONGO_URI!;
-  if (!mongoURI) throw new Error("No Mongo DB Connection String present");
-  const client = await mongoose.connect(mongoURI);
-  console.log(
-    `Connected to MongoDB @ ${client.connection.host} - ${client.connection.name}`
-  );
-} catch (error) {
-  console.log(error);
-  process.exit(1);
+export default async function connectDB() {
+  const uri = process.env.MONGO_URI as string;
+  if (!uri) throw new Error("MONGO_URI is missing");
+  mongoose.set("strictQuery", true);
+  await mongoose.connect(uri);
+  console.log("MongoDB connected");
 }
