@@ -1,13 +1,19 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv";
 
-try {
-  const mongoURI = process.env.MONGO_URI!;
-  if (!mongoURI) throw new Error("No Mongo DB Connection String present");
-  const client = await mongoose.connect(mongoURI);
-  console.log(
-    `Connected to MongoDB @ ${client.connection.host} - ${client.connection.name}`
-  );
-} catch (error) {
-  console.log(error);
-  process.exit(1);
+dotenv.config();
+
+const MONGO_URI =
+  process.env.MONGO_URI || "mongodb://localhost:27017/spendsense";
+
+export async function connectDB() {
+  try {
+    await mongoose.connect(MONGO_URI);
+    console.log("✅ MongoDB connected");
+  } catch (err) {
+    console.error("❌ MongoDB connection error:", err);
+    process.exit(1);
+  }
 }
+
+export default mongoose;

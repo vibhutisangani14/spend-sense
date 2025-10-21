@@ -1,3 +1,3 @@
-export { default as categoryRouter } from "./categoryRouter.ts";
-export { default as userRouter } from "./userRouter.ts";
-export { default as expenseRouter } from "./expenseRouter.ts";
+export { default as categoryRouter } from "./categoryRouter";
+export { default as userRouter } from "./userRouter";
+export { default as expenseRouter } from "./expenseRouter";

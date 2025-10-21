@@ -2,24 +2,24 @@ import { User } from "#models";
 import type { RequestHandler } from "express";
 import { isValidObjectId } from "mongoose";
 import type { z } from "zod";
-import type { userInputSchema, userSchema } from "#schemas";
+import { userInputSchema, userSchema } from "#schemas";
 
 type UserInputDTO = z.infer<typeof userInputSchema>;
 type UserDTO = z.infer<typeof userSchema>;
 
+// 🟢 Get all users
 export const getAllUsers: RequestHandler<{}, UserDTO[]> = async (req, res) => {
-  const allUsers = await User.find().lean();
+  const allUsers = (await User.find().lean().exec()) as unknown as UserDTO[];
   res.json(allUsers);
 };
 
-export const createUser: RequestHandler<{}, UserDTO, UserInputDTO> = async (
-  req,
-  res
-) => {
-  const newUser = await User.create<UserInputDTO>(req.body);
-  res.json(newUser);
+// 🟢 Create new user
+export const createUser: RequestHandler = async (req, res) => {
+  const newUser = await User.create(req.body);
+  res.json(newUser as any);
 };
 
+// 🟢 Get user by ID
 export const getUserById: RequestHandler<{ id: string }, UserDTO> = async (
   req,
   res
@@ -29,11 +29,12 @@ export const getUserById: RequestHandler<{ id: string }, UserDTO> = async (
   if (!isValidObjectId(id))
     throw new Error("Invalid ID", { cause: { status: 400 } });
 
-  const user = await User.findById(id);
+  const user = await User.findById(id).lean();
   if (!user) throw new Error("User not found", { cause: { status: 404 } });
-  res.json(user);
+  res.json(user as any);
 };
 
+// 🟢 Update user
 export const updateUserById: RequestHandler<
   { id: string },
   UserDTO,
@@ -46,17 +47,21 @@ export const updateUserById: RequestHandler<
 
   const updatedUser = await User.findByIdAndUpdate(id, req.body, {
     new: true,
-  });
+  }).lean();
+
   if (!updatedUser)
     throw new Error("User not found!", { cause: { status: 404 } });
-  res.json(updatedUser);
+
+  res.json(updatedUser as any);
 };
 
+// 🟢 Delete user
 export const deleteUserById: RequestHandler<
   { id: string },
   { message: string }
 > = async (req, res) => {
   const { id } = req.params;
+
   if (!isValidObjectId(id))
     throw new Error("Invalid ID", { cause: { status: 400 } });
 

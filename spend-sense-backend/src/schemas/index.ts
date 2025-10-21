@@ -1,4 +1,10 @@
-export * from "./shared.ts";
-export * from "./category.ts";
-export * from "./users.ts";
-export * from "./expense.ts";
+export * from "./shared";
+export * from "./category";
+export * from "./users";
+export * from "./expense";
+
+
+export { userInputSchema, userSchema } from "./users";
+export { categorySchema, categoryInputSchema } from "./category";
+export { expenseSchema, expenseInputSchema } from "./expense";
+
