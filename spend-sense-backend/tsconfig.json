@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ES2022",
     "module": "CommonJS",
     "moduleResolution": "Node",
     "rootDir": "./src",
@@ -11,13 +11,22 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "sourceMap": true,
-    "declaration": false,
-    "types": ["node"],
-    "baseUrl": ".",
+    "baseUrl": "./src",
     "paths": {
-      "@/*": ["src/*"]
+      "#db": ["db/index.ts"],
+      "#db/*": ["db/*"],
+      "#controllers": ["controllers/index.ts"],
+      "#controllers/*": ["controllers/*"],
+      "#routers": ["routers/index.ts"],
+      "#routers/*": ["routers/*"],
+      "#models": ["models/index.ts"],
+      "#models/*": ["models/*"],
+      "#schemas": ["schemas/index.ts"],
+      "#schemas/*": ["schemas/*"],
+      "#middleware": ["middleware/index.ts"],
+      "#middleware/*": ["middleware/*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

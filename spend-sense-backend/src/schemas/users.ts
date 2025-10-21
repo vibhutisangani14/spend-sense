@@ -1,5 +1,5 @@
 import { z } from "zod/v4";
-import { dbEntrySchema } from "./shared.ts";
+import { dbEntrySchema } from "./shared";
 
 const userInputSchema = z.strictObject({
   name: z

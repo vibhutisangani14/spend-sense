@@ -1,3 +1,3 @@
-export * from "./category.ts";
-export * from "./users.ts";
-export * from "./expense.ts";
+export * from "./category";
+export * from "./users";
+export * from "./expense";

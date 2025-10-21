@@ -1,5 +1,5 @@
-import User from "./User.ts";
-import Category from "./Category.ts";
-import Expense from "./Expense.ts";
+import User from "./User";
+import Category from "./Category";
+import Expense from "./Expense";
 
 export { User, Category, Expense };

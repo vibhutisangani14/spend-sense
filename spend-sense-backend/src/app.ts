@@ -20,8 +20,8 @@ app.use("/api/categories", categoryRouter);
 app.use("/api/users", userRouter);
 app.use("/api/expenses", expenseRouter);
 
-// Fallback route
-app.use("*", (req, res) => {
+// ✅ Fallback route for unknown paths
+app.use((req, res) => {
   res.status(404).json({ message: "Not Found" });
 });
 
@@ -29,7 +29,7 @@ app.use("*", (req, res) => {
 app.use(errorHandler);
 
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  console.log(`✅ Server is running on port ${port}`);
 });
 
 export default app;

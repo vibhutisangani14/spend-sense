@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/server.ts",
     "prebuild": "rm -rf dist",
     "build": "tsc -p tsconfig.json",
     "prestart": "npm run build",
@@ -39,15 +39,15 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^22.18.11",
+    "@types/node": "^22.18.12",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.9.3"
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "5.4"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
