@@ -31,6 +31,6 @@ const expenseSchema = new Schema(
   { timestamps: true }
 );
 
-const Expense = model("category", expenseSchema);
+const Expense = model("expense", expenseSchema);
 
 export default Expense;
