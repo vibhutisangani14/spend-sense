@@ -1,7 +1,7 @@
 import app from "./app";
 import { connectDB } from "#db";
 
-const PORT = process.env.PORT ? Number(process.env.PORT) : 8080;
+const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 
 async function start() {
   try {
