@@ -6,7 +6,7 @@ const MainLayout: React.FC = () => {
   return (
     <div className="min-h-screen flex" data-theme="expenseflow">
       <Sidebar />
-      <main className="flex-1 p-6 bg-[url('')]">
+      <main className="flex-1 bg-[url('')]">
         <Outlet />
       </main>
     </div>
