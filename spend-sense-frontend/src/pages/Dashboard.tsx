@@ -1,7 +1,6 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import SummaryCard from "../components/SummaryCard";
 import ExpenseItem from "../components/ExpenseItem";
-import { expensesSeed } from "../data/expenses";
 import {
   PieChart,
   Pie,
@@ -11,6 +10,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Link } from "react-router-dom";
+import { fetchExpenses, fetchCategories } from "../api/expenseApi";
 
 const COLORS = [
   "#7c3aed",
@@ -22,29 +22,91 @@ const COLORS = [
   "#ffa500",
 ];
 
-const Dashboard: React.FC = () => {
-  const expenses = expensesSeed;
+interface Expense {
+  id: string;
+  title: string;
+  amount: number;
+  category: string;
+  method: string;
+  date: string;
+  note?: string;
+}
 
-  const total = useMemo(
-    () => expenses.reduce((s, a) => s + a.amount, 0),
-    [expenses]
-  );
-  const average = useMemo(
-    () => (expenses.length ? total / expenses.length : 0),
-    [total, expenses.length]
-  );
+interface Category {
+  _id: string;
+  name: string;
+}
+
+const Dashboard: React.FC = () => {
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [sortType, setSortType] = useState<
+    "date-newest" | "date-oldest" | "amount-high" | "amount-low"
+  >("date-newest");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // ✅ Load data using the new API layer
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [exp, cats] = await Promise.all([
+          fetchExpenses(),
+          fetchCategories(),
+        ]);
+        setExpenses(exp);
+        setCategories(cats);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  // ✅ Filtering & sorting logic (unchanged)
+  const filteredExpenses = useMemo(() => {
+    let result = [...expenses];
+
+    if (selectedCategory !== "all") {
+      result = result.filter((e) => e.category === selectedCategory);
+    }
+
+    result.sort((a, b) => {
+      if (sortType === "date-newest")
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      if (sortType === "date-oldest")
+        return new Date(a.date).getTime() - new Date(b.date).getTime();
+      if (sortType === "amount-high") return b.amount - a.amount;
+      if (sortType === "amount-low") return a.amount - b.amount;
+      return 0;
+    });
+
+    return result;
+  }, [expenses, selectedCategory, sortType]);
+
+  const total = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
+  const average =
+    filteredExpenses.length > 0 ? total / filteredExpenses.length : 0;
 
   const pieData = useMemo(() => {
     const agg: Record<string, number> = {};
-    expenses.forEach((e) => {
+    filteredExpenses.forEach((e) => {
       agg[e.category] = (agg[e.category] || 0) + e.amount;
     });
     return Object.entries(agg).map(([name, value], i) => ({
       name,
-      value: +value.toFixed(2),
+      value,
       color: COLORS[i % COLORS.length],
     }));
-  }, [expenses]);
+  }, [filteredExpenses]);
+
+  if (loading) return <div className="p-6 text-slate-400">Loading...</div>;
+  if (error)
+    return <div className="p-6 text-red-500">Error loading data: {error}</div>;
 
   return (
     <div className="flex-1 p-6 lg:p-10">
@@ -57,6 +119,7 @@ const Dashboard: React.FC = () => {
           + Add Expense
         </Link>
       </div>
+
       <div className="col-span-12 lg:col-span-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <SummaryCard
@@ -145,19 +208,55 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
+      {/* Filters + Expenses + Chart */}
       <div className="grid grid-cols-12 gap-6 mt-8 lg:col-span-12">
-        <div className="mt-6 p-6 bg-white rounded-2xl card-shadow lg:col-span-8">
-          <div className="mb-4">
-            <div className="font-semibold">Filters</div>
-            <div className="text-xs text-slate-400">All Categories • Date</div>
+        <div className="p-6 bg-white rounded-2xl card-shadow lg:col-span-8">
+          {/* Filters */}
+          <div className="flex flex-wrap gap-4 mb-6">
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="border rounded-xl px-3 py-1 text-sm text-slate-600"
+            >
+              <option value="all">All Categories</option>
+              {categories.map((c) => (
+                <option key={c._id} value={c.name}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={sortType}
+              onChange={(e) =>
+                setSortType(
+                  e.target.value as
+                    | "date-newest"
+                    | "date-oldest"
+                    | "amount-high"
+                    | "amount-low"
+                )
+              }
+              className="border rounded-xl px-3 py-1 text-sm text-slate-600"
+            >
+              <option value="date-newest">Date (Newest)</option>
+              <option value="date-oldest">Date (Oldest)</option>
+              <option value="amount-high">Amount (High → Low)</option>
+              <option value="amount-low">Amount (Low → High)</option>
+            </select>
           </div>
 
-          <div className="mt-4">
-            {expenses.map((e) => (
-              <ExpenseItem key={e.id} e={e} />
-            ))}
-          </div>
+          {/* Expense List */}
+          {filteredExpenses.length > 0 ? (
+            filteredExpenses.map((e) => <ExpenseItem key={e.id} e={e} />)
+          ) : (
+            <div className="text-slate-400 text-sm">
+              No expenses match this filter.
+            </div>
+          )}
         </div>
+
+        {/* Pie Chart */}
         <div className="p-6 bg-white rounded-2xl card-shadow h-full lg:col-span-4">
           <div className="font-semibold text-lg">Spending by Category</div>
           <div style={{ width: "100%", height: 320 }} className="mt-6">
