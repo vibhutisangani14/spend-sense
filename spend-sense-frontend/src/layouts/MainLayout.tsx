@@ -1,9 +1,12 @@
-import { Outlet } from "react-router";
+import React from "react";
+import { Outlet } from "react-router-dom";
+import Sidebar from "../components/Sidebar";
 
-const MainLayout = () => {
+const MainLayout: React.FC = () => {
   return (
-    <div className="text-gray-300 flex-col min-h-screen">
-      <main className="flex-grow flex flex-col">
+    <div className="min-h-screen flex" data-theme="expenseflow">
+      <Sidebar />
+      <main className="flex-1 p-6 bg-[url('')]">
         <Outlet />
       </main>
     </div>

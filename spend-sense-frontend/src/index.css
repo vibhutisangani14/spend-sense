@@ -1,1 +1,35 @@
 @import "tailwindcss";
+/* @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap"); */
+@plugin "daisyui";
+
+:root {
+  --card-shadow: 0 8px 30px rgba(20, 20, 50, 0.06);
+}
+
+body {
+  background: #fafafa;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial;
+}
+
+.header-title {
+  font-weight: 800;
+  color: #9333ea;
+}
+
+.card-shadow {
+  box-shadow: var(--card-shadow);
+}
+
+.btn-gradient {
+  background-image: linear-gradient(90deg, #8a4dff, #6f29ff);
+  color: white;
+}
+
+.pulse-badge {
+  background: linear-gradient(90deg, #f0efff, #fff0fb);
+}
+
+.expense-item {
+  border-radius: 12px;
+}
