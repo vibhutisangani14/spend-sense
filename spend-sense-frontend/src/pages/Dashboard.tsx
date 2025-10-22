@@ -17,7 +17,7 @@ import {
 import { Link } from "react-router-dom";
 import { fetchExpenses, fetchCategories } from "../api/expenseApi";
 
-import { FcBarChart, FcEmptyFilter } from "react-icons/fc";
+import { FcEmptyFilter } from "react-icons/fc";
 
 const COLORS = [
   "#7c3aed",
