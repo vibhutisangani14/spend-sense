@@ -3,7 +3,12 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { errorHandler } from "#middleware";
-import { categoryRouter, userRouter, expenseRouter } from "#routers";
+import {
+  categoryRouter,
+  userRouter,
+  expenseRouter,
+  paymentMethodRouter,
+} from "#routers";
 import authRoutes from "./routes/authRoutes";
 
 dotenv.config();
@@ -19,6 +24,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/categories", categoryRouter);
 app.use("/api/users", userRouter);
 app.use("/api/expenses", expenseRouter);
+app.use("/api/paymentMethods", paymentMethodRouter);
 
 // ✅ Fallback route for unknown paths
 app.use((req, res) => {
