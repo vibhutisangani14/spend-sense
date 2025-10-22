@@ -1,7 +1,6 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import SummaryCard from "../components/SummaryCard";
 import ExpenseItem from "../components/ExpenseItem";
-import { expensesSeed } from "../data/expenses";
 import {
   PieChart,
   Pie,
@@ -22,13 +21,43 @@ const COLORS = [
   "#ffa500",
 ];
 
+interface Expense {
+  _id: string;
+  title: string;
+  amount: number;
+  categoryId: {
+    _id: string;
+    name: string;
+  };
+  date: string;
+}
+
 const Dashboard: React.FC = () => {
-  const expenses = expensesSeed;
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/api/expenses");
+        if (!res.ok) throw new Error("Failed to fetch expenses");
+        const data = await res.json();
+        setExpenses(data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchExpenses();
+  }, []);
 
   const total = useMemo(
-    () => expenses.reduce((s, a) => s + a.amount, 0),
+    () => expenses.reduce((sum, e) => sum + e.amount, 0),
     [expenses]
   );
+
   const average = useMemo(
     () => (expenses.length ? total / expenses.length : 0),
     [total, expenses.length]
@@ -37,7 +66,8 @@ const Dashboard: React.FC = () => {
   const pieData = useMemo(() => {
     const agg: Record<string, number> = {};
     expenses.forEach((e) => {
-      agg[e.category] = (agg[e.category] || 0) + e.amount;
+      const category = e.categoryId?.name || "Uncategorized";
+      agg[category] = (agg[category] || 0) + e.amount;
     });
     return Object.entries(agg).map(([name, value], i) => ({
       name,
@@ -45,6 +75,12 @@ const Dashboard: React.FC = () => {
       color: COLORS[i % COLORS.length],
     }));
   }, [expenses]);
+
+  if (loading) return <div className="p-6 text-slate-400">Loading...</div>;
+  if (error)
+    return (
+      <div className="p-6 text-red-500">Error loading expenses: {error}</div>
+    );
 
   return (
     <div className="flex-1 p-6 lg:p-10">
@@ -57,6 +93,7 @@ const Dashboard: React.FC = () => {
           + Add Expense
         </Link>
       </div>
+
       <div className="col-span-12 lg:col-span-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <SummaryCard
@@ -154,10 +191,11 @@ const Dashboard: React.FC = () => {
 
           <div className="mt-4">
             {expenses.map((e) => (
-              <ExpenseItem key={e.id} e={e} />
+              <ExpenseItem key={e._id} e={e} />
             ))}
           </div>
         </div>
+
         <div className="p-6 bg-white rounded-2xl card-shadow h-full lg:col-span-4">
           <div className="font-semibold text-lg">Spending by Category</div>
           <div style={{ width: "100%", height: 320 }} className="mt-6">
