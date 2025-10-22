@@ -1,12 +1,12 @@
 import React from "react";
 
 interface APIExpense {
-  _id: string;
+  id: string;
   title: string;
   amount: number;
-  categoryId: { _id: string; name: string };
+  category: string;
+  method: string;
   date: string;
-  method?: string;
   note?: string;
 }
 
@@ -21,7 +21,7 @@ const ExpenseItem: React.FC<{ e: APIExpense }> = ({ e }) => {
           <div className="font-semibold">{e.title}</div>
           <div className="text-xs text-slate-400 mt-1">
             <span className="badge badge-sm">
-              {e.categoryId?.name || "Uncategorized"}
+              {e.category || "Uncategorized"}
             </span>
             <span className="ml-2">
               {new Date(e.date).toLocaleDateString()}
