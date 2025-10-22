@@ -6,7 +6,7 @@ export default function App() {
   return (
     <Routes>
       {/* redirect root to signIn */}
-      {/* <Route path="/" element={<Navigate to="/signIn" replace />} /> */}
+      <Route path="/" element={<Navigate to="/signIn" replace />} />
 
       {/* auth routes */}
       <Route path="/signIn" element={<SignIn />} />
@@ -20,7 +20,7 @@ export default function App() {
       </Route>
 
       {/* fallback */}
-      {/* <Route path="*" element={<Navigate to="/signIn" replace />} /> */}
+      <Route path="*" element={<Navigate to="/signIn" replace />} />
     </Routes>
   );
 }
