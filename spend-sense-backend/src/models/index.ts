@@ -1,4 +1,5 @@
-export { default as User } from "#models/User";
-export { default as Category } from "#models/Category";
-export { default as Expense } from "#models/Expense";
-export { default as PaymentMethod } from "#models/PaymentMethod";
+import User from "./User";
+import Category from "./Category";
+import Expense from "./Expense";
+import PaymentMethod from "./PaymentMethod";
+export { User, Category, Expense, PaymentMethod };
