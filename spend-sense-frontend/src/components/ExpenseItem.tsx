@@ -12,6 +12,7 @@ import {
 } from "react-icons/fc";
 import { MdFastfood } from "react-icons/md";
 import { GiShoppingCart } from "react-icons/gi";
+import { Pencil } from "lucide-react";
 
 interface APIExpense {
   id: string;
@@ -66,16 +67,13 @@ const ExpenseItem: React.FC<{ e: APIExpense }> = ({ e }) => {
           )}
         </div>
       </div>
-      <div className="text-right">
+      <div className="flex items-center gap-4 text-right">
         <div className="font-semibold">${e.amount.toFixed(2)}</div>
+
+        <button type="button" onClick={handleEdit}>
+          <Pencil size={20} />
+        </button>
       </div>
-      <button
-        type="button"
-        onClick={handleEdit}
-        className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa]  text-sm text-black font-semibold  hover:bg-indigo-700 transition"
-      >
-        Edit
-      </button>
     </div>
   );
 };
