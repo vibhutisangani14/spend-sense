@@ -64,7 +64,7 @@ const EditExpense: React.FC = () => {
           amount: expenseData.amount || 0,
           categoryId: expenseData.categoryId?._id || "",
           date: expenseData.date?.slice(0, 10) || "",
-          paymentMethodId: expenseData.paymentMethodId || "",
+          paymentMethodId: expenseData.paymentMethodId?._id || "",
           notes: expenseData.notes || "",
           userId: expenseData.userId,
           receipt: null,
@@ -104,8 +104,8 @@ const EditExpense: React.FC = () => {
         amount: Number(expense.amount),
         categoryId: expense.categoryId,
         date: expense.date,
-        // paymentMethodId: expense.paymentMethodId,
-        // notes: expense.notes || "",
+        paymentMethodId: expense.paymentMethodId,
+        notes: expense.notes || "",
         userId,
       };
       console.log("Sending payload:", payload);
