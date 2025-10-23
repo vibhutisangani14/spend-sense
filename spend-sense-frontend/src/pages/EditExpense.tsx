@@ -104,8 +104,8 @@ const EditExpense: React.FC = () => {
         amount: Number(expense.amount),
         categoryId: expense.categoryId,
         date: expense.date,
-        // paymentMethodId: expense.paymentMethodId,
-        // notes: expense.notes || "",
+        paymentMethodId: expense.paymentMethodId,
+        notes: expense.notes || "",
         userId,
       };
       console.log("Sending payload:", payload);

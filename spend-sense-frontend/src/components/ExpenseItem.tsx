@@ -15,7 +15,7 @@ import { GiShoppingCart } from "react-icons/gi";
 import { Pencil } from "lucide-react";
 
 interface APIExpense {
-  id: string;
+  _id: string;
   title: string;
   amount: number;
   category: string;
@@ -43,7 +43,7 @@ const ExpenseItem: React.FC<{ e: APIExpense }> = ({ e }) => {
   const Icon = categoryIcons[e.category] || <FcEmptyFilter />;
 
   const handleEdit = () => {
-    navigate(`/editExpense/${e.id}`);
+    navigate(`/editExpense/${e._id}`);
   };
 
   return (
