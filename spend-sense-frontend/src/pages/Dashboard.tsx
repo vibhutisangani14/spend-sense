@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useLocation, Link } from "react-router-dom";
 import SummaryCard from "../components/SummaryCard";
 import ExpenseItem from "../components/ExpenseItem";
 import {
@@ -14,9 +15,7 @@ import {
   YAxis,
   CartesianGrid,
 } from "recharts";
-import { Link } from "react-router-dom";
 import { fetchExpenses, fetchCategories } from "../api/expenseApi";
-
 import { FcEmptyFilter } from "react-icons/fc";
 
 const COLORS = [
@@ -30,11 +29,11 @@ const COLORS = [
 ];
 
 interface Expense {
-  id: string;
+  _id: string;
   title: string;
   amount: number;
   category: string;
-  method: string;
+  method?: string;
   date: string;
   note?: string;
 }
@@ -45,6 +44,7 @@ interface Category {
 }
 
 const Dashboard: React.FC = () => {
+  const location = useLocation();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -54,34 +54,43 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // ✅ Load data using the new API layer
   useEffect(() => {
     const loadData = async () => {
       try {
+        setLoading(true);
         const [exp, cats] = await Promise.all([
           fetchExpenses(),
           fetchCategories(),
         ]);
-        setExpenses(exp);
+
+        const mapped = exp.map((e: any) => ({
+          _id: e._id,
+          title: e.title,
+          amount: e.amount,
+          category: e.categoryId?.name || e.category || "Other",
+          method: e.paymentMethod || "Unknown",
+          date: e.date,
+          note: e.notes || "",
+        }));
+
+        setExpenses(mapped);
         setCategories(cats);
       } catch (err: any) {
-        setError(err.message);
+        console.error("❌ Error loading data:", err);
+        setError(err.message || "Failed to load data");
       } finally {
         setLoading(false);
       }
     };
 
     loadData();
-  }, []);
+  }, [location.pathname]);
 
-  // ✅ Filtering & sorting logic (unchanged)
   const filteredExpenses = useMemo(() => {
     let result = [...expenses];
-
     if (selectedCategory !== "all") {
       result = result.filter((e) => e.category === selectedCategory);
     }
-
     result.sort((a, b) => {
       if (sortType === "date-newest")
         return new Date(b.date).getTime() - new Date(a.date).getTime();
@@ -91,7 +100,6 @@ const Dashboard: React.FC = () => {
       if (sortType === "amount-low") return a.amount - b.amount;
       return 0;
     });
-
     return result;
   }, [expenses, selectedCategory, sortType]);
 
@@ -111,21 +119,30 @@ const Dashboard: React.FC = () => {
     }));
   }, [filteredExpenses]);
 
-  // Bar chart
   const barData = useMemo(() => {
-    const months = ["May", "Jun", "Jul", "Aug", "Sep", "Oct"];
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
     const monthlyTotals: Record<string, number> = {};
-
     months.forEach((month) => {
       monthlyTotals[month] = 0;
     });
-
     filteredExpenses.forEach((e) => {
       const date = new Date(e.date);
-      const month = months[date.getMonth()]; // Adjust if your data spans multiple years
+      const month = months[date.getMonth()];
       monthlyTotals[month] = (monthlyTotals[month] || 0) + e.amount;
     });
-
     return months.map((month) => ({
       month,
       amount: monthlyTotals[month] || 0,
@@ -148,149 +165,57 @@ const Dashboard: React.FC = () => {
         </Link>
       </div>
 
-      <div className="col-span-12 lg:col-span-8">
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
-          <SummaryCard
-            title="Total Expenses"
-            value={`$${total.toFixed(2)}`}
-            subtitle={`${expenses.length} transactions`}
-            icon={
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-purple-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8c-1.657 0-3 1.343-3 3v5h6v-5c0-1.657-1.343-3-3-3z"
-                />
-              </svg>
-            }
-          />
-          <SummaryCard
-            title="This Month"
-            value="$0.00"
-            subtitle="First month"
-            icon={
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-purple-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 7V3m8 4V3M3 11h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-            }
-          />
-          <SummaryCard
-            title="Average Expense"
-            value={`$${average.toFixed(2)}`}
-            icon={
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-pink-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M11 11V3m0 0L7 7m4-4 4 4M3 21h18"
-                />
-              </svg>
-            }
-          />
-          <SummaryCard
-            title="Payment Methods"
-            value="4"
-            subtitle="Active methods"
-            icon={
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-cyan-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 10h18M7 15h.01M11 15h.01M15 15h.01"
-                />
-              </svg>
-            }
-          />
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
+        <SummaryCard
+          title="Total Expenses"
+          value={`$${total.toFixed(2)}`}
+          subtitle={`${expenses.length} transactions`}
+        />
+        <SummaryCard title="Average Expense" value={`$${average.toFixed(2)}`} />
       </div>
 
-      {/* Chart */}
       <div className="grid grid-cols-12 gap-6 mt-8 lg:col-span-12">
-        {/* Bar Chart */}
         <div className="p-6 bg-white rounded-xl card-shadow h-full lg:col-span-6">
-          <div className="flex items-center gap-2 font-semibold text-lg">
-            <span>📊 Spending Trends</span>
-          </div>
-          <p className="text-sm text-[#9ca3af]">Last 6 months overview</p>
-          <div style={{ width: "100%", height: 320 }} className="mt-6">
-            <ResponsiveContainer>
-              <BarChart
-                data={barData}
-                margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="amount" fill="#7c3aed" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          <h2 className="font-semibold text-lg mb-2">📊 Spending Trends</h2>
+          <ResponsiveContainer width="100%" height={320}>
+            <BarChart
+              data={barData}
+              margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="amount" fill="#7c3aed" />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
 
-        {/* Pie Chart */}
         <div className="p-6 bg-white rounded-xl card-shadow h-full lg:col-span-6">
-          <div className="font-semibold text-lg">Spending by Category</div>
-          <div style={{ width: "100%", height: 320 }} className="mt-6">
-            <ResponsiveContainer>
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={90}
-                  label
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+          <h2 className="font-semibold text-lg mb-2">Spending by Category</h2>
+          <ResponsiveContainer width="100%" height={320}>
+            <PieChart>
+              <Pie
+                data={pieData}
+                dataKey="value"
+                nameKey="name"
+                outerRadius={90}
+                label
+              >
+                {pieData.map((entry, index) => (
+                  <Cell key={entry.name + index} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="p-6 bg-white rounded-xl card-shadow lg:col-span-8 mt-8">
-        <div className="flex flex-wrap gap-2">
-          <FcEmptyFilter className="text-purple-600 h-6 w-6 mt-1" />
+      <div className="p-6 bg-white rounded-xl card-shadow mt-8">
+        <div className="flex flex-wrap gap-2 items-center">
+          <FcEmptyFilter className="text-purple-600 h-6 w-6" />
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
@@ -325,11 +250,9 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Expenses */}
-      <div className="p-6 bg-white rounded-xl card-shadow lg:col-span-8 mt-8">
-        {/* Expense List */}
+      <div className="p-6 bg-white rounded-xl card-shadow mt-8">
         {filteredExpenses.length > 0 ? (
-          filteredExpenses.map((e) => <ExpenseItem key={e.id} e={e} />)
+          filteredExpenses.map((e) => <ExpenseItem key={e._id} e={e} />)
         ) : (
           <div className="text-slate-400 text-sm">
             No expenses match this filter.

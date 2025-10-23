@@ -3,9 +3,10 @@ export interface ExpenseResponse {
   title: string;
   amount: number;
   categoryId?: { name: string };
-  method?: string;
+  userId?: { name: string };
+  paymentMethod?: string;
   date: string;
-  note?: string;
+  notes?: string;
 }
 
 export interface Category {
@@ -13,32 +14,53 @@ export interface Category {
   name: string;
 }
 
-const API_BASE = "http://localhost:3000/api";
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
-/**
- * Fetch all expenses
- */
+
 export const fetchExpenses = async () => {
-  const res = await fetch(`${API_BASE}/expenses`);
-  if (!res.ok) throw new Error("Failed to fetch expenses");
+  const token =
+    localStorage.getItem("spendsense_token") ||
+    sessionStorage.getItem("spendsense_token");
+
+  const res = await fetch(`${API_BASE}/expenses`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!res.ok) {
+    if (res.status === 401)
+      throw new Error("Unauthorized: please log in again");
+    throw new Error("Failed to fetch expenses");
+  }
+
   const data: ExpenseResponse[] = await res.json();
 
   return data.map((e) => ({
-    id: e._id,
+    _id: e._id,
     title: e.title,
     amount: e.amount,
     category: e.categoryId?.name || "Uncategorized",
-    method: e.method || "Unknown",
+    method: e.paymentMethod || "Unknown",
     date: e.date,
-    note: e.note || "",
+    note: e.notes || "",
   }));
 };
 
-/**
- * Fetch all categories
- */
+
 export const fetchCategories = async (): Promise<Category[]> => {
-  const res = await fetch(`${API_BASE}/categories`);
+  const token =
+    localStorage.getItem("spendsense_token") ||
+    sessionStorage.getItem("spendsense_token");
+
+  const res = await fetch(`${API_BASE}/categories`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+
   if (!res.ok) throw new Error("Failed to fetch categories");
   return res.json();
 };
