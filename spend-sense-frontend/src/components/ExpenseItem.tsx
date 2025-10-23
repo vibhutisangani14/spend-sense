@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FcEmptyFilter,
   FcReading,
@@ -11,6 +12,7 @@ import {
 } from "react-icons/fc";
 import { MdFastfood } from "react-icons/md";
 import { GiShoppingCart } from "react-icons/gi";
+import { Pencil } from "lucide-react";
 
 interface APIExpense {
   id: string;
@@ -37,7 +39,12 @@ const categoryIcons: Record<string, React.ReactNode> = {
 };
 
 const ExpenseItem: React.FC<{ e: APIExpense }> = ({ e }) => {
+  const navigate = useNavigate();
   const Icon = categoryIcons[e.category] || <FcEmptyFilter />;
+
+  const handleEdit = () => {
+    navigate(`/editExpense/${e.id}`);
+  };
 
   return (
     <div className="flex items-center justify-between p-4 bg-white expense-item card-shadow mb-4">
@@ -60,8 +67,12 @@ const ExpenseItem: React.FC<{ e: APIExpense }> = ({ e }) => {
           )}
         </div>
       </div>
-      <div className="text-right">
+      <div className="flex items-center gap-4 text-right">
         <div className="font-semibold">${e.amount.toFixed(2)}</div>
+
+        <button type="button" onClick={handleEdit}>
+          <Pencil size={20} />
+        </button>
       </div>
     </div>
   );
