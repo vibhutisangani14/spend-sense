@@ -3,6 +3,7 @@ import { dbEntrySchema } from "./shared";
 import { isValidObjectId, Types } from "mongoose";
 import { categoryInputSchema } from "./category";
 import { userInputSchema } from "./users";
+import { paymentMethodInputSchema } from "./paymentMethod";
 
 const expenseInputSchema = z.strictObject({
   title: z
@@ -17,6 +18,11 @@ const expenseInputSchema = z.strictObject({
     .any()
     .refine((val) => !isNaN(Date.parse(val)), { message: "Invalid date" })
     .transform((val) => new Date(val)),
+  paymentMethodId: z
+    .string()
+    .refine((val) => isValidObjectId(val), "Invalid Payment method ID")
+    .optional(),
+  notes: z.string().optional(),
   userId: z.string().refine((val) => isValidObjectId(val), "Invalid User ID"),
 });
 
@@ -28,11 +34,17 @@ const populateUserSchema = z.strictObject({
   ...userInputSchema.shape,
   _id: z.instanceof(Types.ObjectId),
 });
+const populatePaymentMethodSchema = z.strictObject({
+  ...paymentMethodInputSchema.shape,
+  _id: z.instanceof(Types.ObjectId),
+});
+
 const expenseSchema = z.strictObject({
   ...expenseInputSchema.shape,
   ...dbEntrySchema.shape,
   categoryId: populateCategorySchema,
   userId: populateUserSchema,
+  paymentMethodId: populatePaymentMethodSchema,
 });
 
 export {
@@ -40,4 +52,5 @@ export {
   expenseSchema,
   populateCategorySchema,
   populateUserSchema,
+  populatePaymentMethodSchema,
 };
