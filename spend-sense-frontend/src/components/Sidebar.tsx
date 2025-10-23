@@ -1,25 +1,12 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-
+import { LayoutDashboard, Plus, Wallet } from "lucide-react";
 const Sidebar: React.FC = () => {
   return (
-    <aside className="w-64 h-screen sticky top-0 bg-white border-r">
+    <aside className="w-64 h-screen sticky top-0 bg-[#fafafa]">
       <div className="p-6 flex items-center gap-3">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-white">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M3 7h18M3 12h18M3 17h18"
-            />
-          </svg>
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-white">
+          <Wallet className="w-5 h-5" />
         </div>
         <div>
           <div className="font-bold text-lg">ExpenseFlow</div>
@@ -29,35 +16,31 @@ const Sidebar: React.FC = () => {
 
       <nav className="p-4">
         <NavLink
-          to="/"
+          to="/app"
           end
           className={({ isActive }) =>
-            `flex items-center gap-3 p-3 rounded-lg ${
+            `flex items-center gap-3 px-4 py-1.5 rounded-xl text-sm ${
               isActive
-                ? "bg-gradient-to-r from-[#efeaff] to-[#fff0fb] text-purple-700 font-semibold"
+                ? " bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] text-white font-semibold text-sm"
                 : "text-slate-600"
             }`
           }
         >
-          <span className="w-8 h-8 rounded-md flex items-center justify-center bg-white card-shadow">
-            📊
-          </span>
+          <LayoutDashboard className="w-4 h-4" />
           Dashboard
         </NavLink>
 
         <NavLink
-          to="/add"
+          to="/app/addExpense"
           className={({ isActive }) =>
-            `flex items-center gap-3 p-3 mt-3 rounded-lg ${
+            `flex items-center gap-3 px-4 py-1.5 text-sm mt-3 rounded-lg ${
               isActive
-                ? "bg-purple-50 text-purple-700 font-semibold"
+                ? "bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] text-white font-semibold text-sm"
                 : "text-slate-600"
             }`
           }
         >
-          <span className="w-8 h-8 rounded-md flex items-center justify-center bg-white card-shadow">
-            ➕
-          </span>
+          <Plus className="w-4 h-4" />
           Add Expense
         </NavLink>
       </nav>

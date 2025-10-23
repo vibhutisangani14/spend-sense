@@ -44,7 +44,7 @@ export default function SignIn() {
     try {
       setLoading(true);
       await login(form.email, form.password);
-      nav("/");
+      nav("/app");
     } catch {
       setError("Invalid email or password.");
     } finally {
