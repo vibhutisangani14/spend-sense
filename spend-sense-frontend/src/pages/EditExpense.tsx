@@ -64,7 +64,7 @@ const EditExpense: React.FC = () => {
           amount: expenseData.amount || 0,
           categoryId: expenseData.categoryId?._id || "",
           date: expenseData.date?.slice(0, 10) || "",
-          paymentMethodId: expenseData.paymentMethodId || "",
+          paymentMethodId: expenseData.paymentMethodId?._id || "",
           notes: expenseData.notes || "",
           userId: expenseData.userId,
           receipt: null,
