@@ -7,17 +7,27 @@ import {
 } from "mongoose";
 import bcrypt from "bcryptjs";
 
+/**
+ *  TypeScript interface
+ */
 export interface IUser extends Document {
-  _id: Types.ObjectId; // ← add this
+  _id: Types.ObjectId;
   name: string;
   email: string;
   password: string;
   comparePassword(candidate: string): Promise<boolean>;
 }
 
+/**
+ * User Schema
+ */
 const userSchema = new Schema<IUser>(
   {
-    name: { type: String, required: [true, "Name is required"], trim: true },
+    name: {
+      type: String,
+      required: [true, "Name is required"],
+      trim: true,
+    },
     email: {
       type: String,
       required: [true, "Email is required"],
@@ -36,21 +46,31 @@ const userSchema = new Schema<IUser>(
   { timestamps: true }
 );
 
-// userSchema.index({ email: 1 }, { unique: true });
-
+/**
+ * Pre-save hook → hash password before saving
+ */
 userSchema.pre(
   "save",
   async function (this: IUser, next: CallbackWithoutResultAndOptionalError) {
-    if (!this.isModified("password")) return next();
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
+    try {
+      if (!this.isModified("password")) return next();
+
+      const salt = await bcrypt.genSalt(10);
+      this.password = await bcrypt.hash(this.password, salt);
+      next();
+    } catch (err) {
+      next(err as any);
+    }
   }
 );
 
-userSchema.methods.comparePassword = function (candidate: string) {
+/**
+ *  Password comparison method
+ */
+userSchema.methods.comparePassword = async function (candidate: string) {
   return bcrypt.compare(candidate, this.password);
 };
 
-const User = model<IUser>("user", userSchema);
+
+const User = model<IUser>("User", userSchema);
 export default User;
