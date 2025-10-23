@@ -14,7 +14,7 @@ const SummaryCard: React.FC<SummaryCardProps> = ({
   icon,
 }) => {
   return (
-    <div className="p-6 bg-white rounded-2xl card-shadow">
+    <div className="p-6 bg-white rounded-xl card-shadow">
       <div className="flex items-start justify-between">
         <div>
           <div className="text-sm text-slate-400">{title}</div>

@@ -43,7 +43,16 @@ export default function SignIn() {
 
     try {
       setLoading(true);
-      await login(form.email, form.password);
+      const res = await login(form.email, form.password);
+
+      if (res?.token) {
+        if (form.remember) {
+          localStorage.setItem("token", res.token);
+        } else {
+          sessionStorage.setItem("token", res.token);
+        }
+      }
+
       nav("/app");
     } catch {
       setError("Invalid email or password.");
@@ -83,6 +92,7 @@ export default function SignIn() {
           </p>
 
           <form onSubmit={onSubmit} className="space-y-5">
+            {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Email
@@ -97,6 +107,7 @@ export default function SignIn() {
               />
             </div>
 
+            {/* Password */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Password
@@ -123,6 +134,7 @@ export default function SignIn() {
               </div>
             </div>
 
+            {/* Remember me */}
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 text-sm text-gray-600">
                 <input
@@ -139,8 +151,10 @@ export default function SignIn() {
               </Link>
             </div>
 
+            {/* Error */}
             {error && <p className="text-sm text-red-600">{error}</p>}
 
+            {/* Submit */}
             <button
               type="submit"
               disabled={loading}

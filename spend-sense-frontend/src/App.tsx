@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AddExpense, Dashboard, EditExpense, SignIn, SignUp } from "./pages";
 import { MainLayout } from "./layouts";
+import ProtectedRoute from "./routes/ProtectedRoute";
 
 export default function App() {
   return (
@@ -12,8 +13,15 @@ export default function App() {
       <Route path="/signIn" element={<SignIn />} />
       <Route path="/signUp" element={<SignUp />} />
 
-      {/* app routes under /app */}
-      <Route path="/app" element={<MainLayout />}>
+      {/* protected routes */}
+      <Route
+        path="/app"
+        element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }
+      >
         <Route index element={<Dashboard />} />
         <Route path="editExpense" element={<EditExpense />} />
         <Route path="addExpense" element={<AddExpense />} />

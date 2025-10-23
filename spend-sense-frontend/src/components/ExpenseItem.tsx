@@ -1,4 +1,16 @@
 import React from "react";
+import {
+  FcEmptyFilter,
+  FcReading,
+  FcShop,
+  FcSlrBackSide,
+  FcHome,
+  FcLike,
+  FcShipped,
+  FcGlobe,
+} from "react-icons/fc";
+import { MdFastfood } from "react-icons/md";
+import { GiShoppingCart } from "react-icons/gi";
 
 interface APIExpense {
   id: string;
@@ -10,12 +22,28 @@ interface APIExpense {
   note?: string;
 }
 
+// Map your categories to icons
+const categoryIcons: Record<string, React.ReactNode> = {
+  Education: <FcReading />,
+  "Food & Dining": <MdFastfood />,
+  Transportation: <FcShipped />,
+  Other: <FcEmptyFilter />,
+  Shopping: <FcShop />,
+  Entertainment: <FcSlrBackSide />,
+  "Bills & Utilities": <FcHome />,
+  Healthcare: <FcLike />,
+  Travel: <FcGlobe />,
+  Groceries: <GiShoppingCart />,
+};
+
 const ExpenseItem: React.FC<{ e: APIExpense }> = ({ e }) => {
+  const Icon = categoryIcons[e.category] || <FcEmptyFilter />;
+
   return (
     <div className="flex items-center justify-between p-4 bg-white expense-item card-shadow mb-4">
       <div className="flex items-center gap-4">
         <div className="w-12 h-12 rounded-lg bg-slate-50 flex items-center justify-center">
-          🧾
+          {Icon}
         </div>
         <div>
           <div className="font-semibold">{e.title}</div>
@@ -24,7 +52,7 @@ const ExpenseItem: React.FC<{ e: APIExpense }> = ({ e }) => {
               {e.category || "Uncategorized"}
             </span>
             <span className="ml-2">
-              {new Date(e.date).toLocaleDateString()}
+              {new Date(e.date).toLocaleDateString()} . {e.method}
             </span>
           </div>
           {e.note && (
