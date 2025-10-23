@@ -11,10 +11,8 @@ import {
 
 const expenseRouter = Router();
 
-expenseRouter
-  .route("/")
-  .get(getAllExpenses)
-  .post(validateBody(expenseInputSchema), createExpense);
+expenseRouter.route("/").get(getAllExpenses).post(createExpense);
+
 expenseRouter
   .route("/:id")
   .get(getExpenseById)
