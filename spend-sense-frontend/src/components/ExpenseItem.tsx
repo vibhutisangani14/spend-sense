@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FcEmptyFilter,
   FcReading,
@@ -37,7 +38,12 @@ const categoryIcons: Record<string, React.ReactNode> = {
 };
 
 const ExpenseItem: React.FC<{ e: APIExpense }> = ({ e }) => {
+  const navigate = useNavigate();
   const Icon = categoryIcons[e.category] || <FcEmptyFilter />;
+
+  const handleEdit = () => {
+    navigate(`/editExpense/${e.id}`);
+  };
 
   return (
     <div className="flex items-center justify-between p-4 bg-white expense-item card-shadow mb-4">
@@ -63,6 +69,13 @@ const ExpenseItem: React.FC<{ e: APIExpense }> = ({ e }) => {
       <div className="text-right">
         <div className="font-semibold">${e.amount.toFixed(2)}</div>
       </div>
+      <button
+        type="button"
+        onClick={handleEdit}
+        className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa]  text-sm text-black font-semibold  hover:bg-indigo-700 transition"
+      >
+        Edit
+      </button>
     </div>
   );
 };

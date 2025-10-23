@@ -23,10 +23,10 @@ export default function App() {
         }
       >
         <Route index element={<Dashboard />} />
-        <Route path="editExpense" element={<EditExpense />} />
         <Route path="addExpense" element={<AddExpense />} />
       </Route>
 
+      <Route path="/editExpense/:id" element={<EditExpense />} />
       {/* fallback */}
       <Route path="*" element={<Navigate to="/signIn" replace />} />
     </Routes>
