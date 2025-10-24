@@ -62,7 +62,7 @@ export default function SignUp() {
         <div className="relative hidden md:block bg-gradient-to-b from-[#efeafd] to-[#f6f5ff]">
           <div className="absolute inset-0 flex items-center justify-center p-10">
             <img
-              src="../src/images/images.jfif"
+              src="../src/images/q.png"
               alt="Illustration"
               className="absolute inset-0 w-full h-full object-contain p-10"
             />
