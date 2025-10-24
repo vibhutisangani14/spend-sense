@@ -28,7 +28,6 @@ interface Expense {
 const EditExpense: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(true);
 
   const [categories, setCategories] = useState<Category[]>([]);
@@ -171,7 +170,7 @@ const EditExpense: React.FC = () => {
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">
-                Amount ($) *
+                Amount (€) *
               </label>
               <input
                 type="number"
