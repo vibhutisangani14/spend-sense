@@ -1,6 +1,27 @@
-import { Schema, model } from "mongoose";
+import {
+  Schema,
+  model,
+  Document,
+  CallbackWithoutResultAndOptionalError,
+  Types,
+} from "mongoose";
+import bcrypt from "bcryptjs";
 
-const userSchema = new Schema(
+/**
+ *  TypeScript interface
+ */
+export interface IUser extends Document {
+  _id: Types.ObjectId;
+  name: string;
+  email: string;
+  password: string;
+  comparePassword(candidate: string): Promise<boolean>;
+}
+
+/**
+ * User Schema
+ */
+const userSchema = new Schema<IUser>(
   {
     name: {
       type: String,
@@ -12,6 +33,7 @@ const userSchema = new Schema(
       required: [true, "Email is required"],
       unique: true,
       trim: true,
+      lowercase: true,
       match: [/^\S+@\S+\.\S+$/, "Email is not valid"],
     },
     password: {
@@ -24,6 +46,30 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-const User = model("user", userSchema);
+/**
+ * Pre-save hook → hash password before saving
+ */
+userSchema.pre(
+  "save",
+  async function (this: IUser, next: CallbackWithoutResultAndOptionalError) {
+    try {
+      if (!this.isModified("password")) return next();
 
+      const salt = await bcrypt.genSalt(10);
+      this.password = await bcrypt.hash(this.password, salt);
+      next();
+    } catch (err) {
+      next(err as any);
+    }
+  }
+);
+
+/**
+ *  Password comparison method
+ */
+userSchema.methods.comparePassword = async function (candidate: string) {
+  return bcrypt.compare(candidate, this.password);
+};
+
+const User = model<IUser>("user", userSchema);
 export default User;

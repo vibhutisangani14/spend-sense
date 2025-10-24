@@ -27,10 +27,20 @@ const expenseSchema = new Schema(
       ref: "user",
       required: [true, "Category Id is required"],
     },
+    paymentMethodId: {
+      type: Schema.Types.ObjectId,
+      ref: "paymentMethod",
+      required: false,
+    },
+    notes: {
+      type: String,
+      default: "",
+      trim: true,
+    },
   },
   { timestamps: true }
 );
 
-const Expense = model("category", expenseSchema);
+const Expense = model("expense", expenseSchema);
 
 export default Expense;
