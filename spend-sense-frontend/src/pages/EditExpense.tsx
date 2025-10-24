@@ -49,6 +49,8 @@ const EditExpense: React.FC = () => {
 
   //Fetch expense, categories, and payment methods
   useEffect(() => {
+    console.log(id);
+
     const fetchData = async () => {
       try {
         const [expenseRes, categoryRes, paymentRes] = await Promise.all([

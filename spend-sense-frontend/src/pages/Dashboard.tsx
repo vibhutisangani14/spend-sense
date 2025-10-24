@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import SummaryCard from "../components/SummaryCard";
 import ExpenseItem from "../components/ExpenseItem";
+import { Plus } from "lucide-react";
 import {
   PieChart,
   Pie,
@@ -157,11 +158,17 @@ const Dashboard: React.FC = () => {
     <div className="flex-1 p-6 lg:p-10">
       <div className="flex items-center mb-6 justify-between">
         <div>
-          <h1 className="text-4xl header-title">Expense Dashboard</h1>
+          <h1 className="text-4xl font-bold bg-[linear-gradient(135deg,#5344e5,#7c4bed,#9035ea)] bg-clip-text text-transparent">
+            Expense Dashboard
+          </h1>
           <p className="text-slate-400 mt-2">Track and manage your spending</p>
         </div>
-        <Link to="/add" className="btn btn-gradient px-5 py-2 rounded-l">
-          + Add Expense
+        <Link
+          to="/app/addExpense"
+          className="btn bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] text-white shadow-xl px-5 py-2 rounded-lg"
+        >
+          <Plus className="w-4 h-4" />
+          Add Expense
         </Link>
       </div>
 
