@@ -37,7 +37,7 @@ const Sidebar: React.FC = () => {
           <Wallet className="w-5 h-5" />
         </div>
         <div>
-          <div className="font-bold text-lg">ExpenseFlow</div>
+          <div className="font-bold text-lg">SpendSense</div>
           <div className="text-xs text-slate-400">Track your spending</div>
         </div>
       </div>
