@@ -48,6 +48,7 @@ const Dashboard: React.FC = () => {
   const location = useLocation();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [paymentMethods, setPaymentMethods] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortType, setSortType] = useState<
     "date-newest" | "date-oldest" | "amount-high" | "amount-low"
@@ -59,9 +60,12 @@ const Dashboard: React.FC = () => {
     const loadData = async () => {
       try {
         setLoading(true);
-        const [exp, cats] = await Promise.all([
+        const [exp, cats, methods] = await Promise.all([
           fetchExpenses(),
           fetchCategories(),
+          fetch("http://localhost:3000/api/paymentMethods").then((res) =>
+            res.json()
+          ),
         ]);
 
         const mapped = exp.map((e: any) => ({
@@ -76,6 +80,7 @@ const Dashboard: React.FC = () => {
 
         setExpenses(mapped);
         setCategories(cats);
+        setPaymentMethods(methods);
       } catch (err: any) {
         console.error("❌ Error loading data:", err);
         setError(err.message || "Failed to load data");
@@ -150,6 +155,21 @@ const Dashboard: React.FC = () => {
     }));
   }, [filteredExpenses]);
 
+  // Calculate total for current month
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  const thisMonthExpenses = expenses.filter((e) => {
+    const d = new Date(e.date);
+    return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+  });
+
+  const thisMonthTotal = thisMonthExpenses.reduce(
+    (sum, e) => sum + e.amount,
+    0
+  );
+
   if (loading) return <div className="p-6 text-slate-400">Loading...</div>;
   if (error)
     return <div className="p-6 text-red-500">Error loading data: {error}</div>;
@@ -172,13 +192,92 @@ const Dashboard: React.FC = () => {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
-        <SummaryCard
-          title="Total Expenses"
-          value={`$${total.toFixed(2)}`}
-          subtitle={`${expenses.length} transactions`}
-        />
-        <SummaryCard title="Average Expense" value={`$${average.toFixed(2)}`} />
+      <div className="col-span-12 lg:col-span-8">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
+          <SummaryCard
+            title="Total Expenses"
+            value={`€${total.toFixed(2)}`}
+            subtitle={`${expenses.length} transactions`}
+            icon={
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 text-purple-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8c-1.657 0-3 1.343-3 3v5h6v-5c0-1.657-1.343-3-3-3z"
+                />
+              </svg>
+            }
+          />
+          <SummaryCard
+            title="This Month"
+            value={`€${thisMonthTotal.toFixed(2)}`}
+            subtitle="First month"
+            icon={
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 text-purple-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 7V3m8 4V3M3 11h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+            }
+          />
+          <SummaryCard
+            title="Average Expense"
+            value={`€${average.toFixed(2)}`}
+            icon={
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 text-pink-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M11 11V3m0 0L7 7m4-4 4 4M3 21h18"
+                />
+              </svg>
+            }
+          />
+          <SummaryCard
+            title="Payment Methods"
+            value={paymentMethods.length.toString()}
+            subtitle="Active methods"
+            icon={
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 text-cyan-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 10h18M7 15h.01M11 15h.01M15 15h.01"
+                />
+              </svg>
+            }
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-12 gap-6 mt-8 lg:col-span-12">

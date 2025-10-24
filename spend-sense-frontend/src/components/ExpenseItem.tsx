@@ -43,7 +43,7 @@ const ExpenseItem: React.FC<{ e: APIExpense }> = ({ e }) => {
   const Icon = categoryIcons[e.category] || <FcEmptyFilter />;
 
   const handleEdit = () => {
-    navigate(`/editExpense/${e._id}`);
+    navigate(`/app/editExpense/${e._id}`);
   };
 
   return (
@@ -68,7 +68,7 @@ const ExpenseItem: React.FC<{ e: APIExpense }> = ({ e }) => {
         </div>
       </div>
       <div className="flex items-center gap-4 text-right">
-        <div className="font-semibold">${e.amount.toFixed(2)}</div>
+        <div className="font-semibold">€{e.amount.toFixed(2)}</div>
 
         <button type="button" onClick={handleEdit}>
           <Pencil size={20} />
