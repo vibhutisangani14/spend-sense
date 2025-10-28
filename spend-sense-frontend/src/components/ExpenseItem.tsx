@@ -15,30 +15,33 @@ import { GiShoppingCart } from "react-icons/gi";
 import { Pencil } from "lucide-react";
 
 interface APIExpense {
-  _id: string;
-  title: string;
-  amount: number;
-  category: string;
-  method: string;
-  date: string;
-  note?: string;
+  e: {
+    _id: string;
+    title: string;
+    amount: number;
+    category: string;
+    method: string;
+    date: string;
+    note?: string;
+  };
 }
 
 // Map your categories to icons
 const categoryIcons: Record<string, React.ReactNode> = {
-  Education: <FcReading />,
-  "Food & Dining": <MdFastfood />,
-  Transportation: <FcShipped />,
-  Other: <FcEmptyFilter />,
-  Shopping: <FcShop />,
-  Entertainment: <FcSlrBackSide />,
-  "Bills & Utilities": <FcHome />,
-  Healthcare: <FcLike />,
-  Travel: <FcGlobe />,
-  Groceries: <GiShoppingCart />,
+  Education: <FcReading className="text-3xl" />,
+  "Food & Dining": <MdFastfood className="text-3xl" />,
+  Transportation: <FcShipped className="text-3xl" />,
+  Other: <FcEmptyFilter className="text-3xl" />,
+  Shopping: <FcShop className="text-3xl" />,
+  Entertainment: <FcSlrBackSide className="text-3xl" />,
+  "Bills & Utilities": <FcHome className="text-3xl" />,
+  Healthcare: <FcLike className="text-3xl" />,
+  Travel: <FcGlobe className="text-3xl" />,
+  Groceries: <GiShoppingCart className="text-3xl" />,
 };
 
-const ExpenseItem: React.FC<{ e: APIExpense }> = ({ e }) => {
+const ExpenseItem: React.FC<APIExpense> = ({ e }) => {
+  console.log(e);
   const navigate = useNavigate();
   const Icon = categoryIcons[e.category] || <FcEmptyFilter />;
 

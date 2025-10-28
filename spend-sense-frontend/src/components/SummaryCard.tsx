@@ -5,6 +5,7 @@ interface SummaryCardProps {
   value: string;
   subtitle?: string;
   icon?: React.ReactNode;
+  color?: string;
 }
 
 const SummaryCard: React.FC<SummaryCardProps> = ({
@@ -12,10 +13,14 @@ const SummaryCard: React.FC<SummaryCardProps> = ({
   value,
   subtitle,
   icon,
+  color,
 }) => {
   return (
-    <div className="p-6 bg-white rounded-xl card-shadow">
-      <div className="flex items-start justify-between">
+    <div className="p-6 bg-white rounded-xl card-shadow relative overflow-hidden">
+      <div
+        className={`absolute top-0 right-0 w-20 h-20 ${color} rounded-bl-full`}
+      ></div>
+      <div className="flex items-start justify-between relative z-10">
         <div>
           <div className="text-sm text-slate-400">{title}</div>
           <div className="text-2xl font-extrabold mt-2">{value}</div>

@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Plus, Wallet, LogOut, User } from "lucide-react";
-import { logout } from "../services/auth";
+
+import {
+  LayoutDashboard,
+  Plus,
+  Wallet,
+  LogOut,
+  User,
+  MessageSquare,
+} from "lucide-react";
 
 interface User {
   _id: string;
@@ -26,7 +33,7 @@ const Sidebar: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      await logout();
+      // await logout();
       setUser(null);
       localStorage.removeItem("spendsense_token");
       localStorage.removeItem("spendsense_user");
@@ -40,7 +47,7 @@ const Sidebar: React.FC = () => {
     }
   };
   return (
-    <aside className="w-64 h-screen sticky top-0 bg-[#fafafa]">
+    <aside className="w-64 h-screen sticky top-0 bg-[#fafafa] overflow-hidden">
       {/* Logo */}
       <div className="p-6 flex items-center gap-3">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-white">
@@ -60,7 +67,7 @@ const Sidebar: React.FC = () => {
           className={({ isActive }) =>
             `flex items-center gap-3 px-4 py-1.5 rounded-xl text-sm ${
               isActive
-                ? "bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] text-white font-semibold"
+                ? "bg-[linear-gradient(135deg,#6366f1,#8b5cf6)] text-white font-semibold shadow-md"
                 : "text-slate-600 hover:bg-slate-100 transition-all"
             }`
           }
@@ -74,13 +81,28 @@ const Sidebar: React.FC = () => {
           className={({ isActive }) =>
             `flex items-center gap-3 px-4 py-1.5 text-sm mt-3 rounded-lg ${
               isActive
-                ? "bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] text-white font-semibold"
+                ? "bg-[linear-gradient(135deg,#6366f1,#8b5cf6)] text-white font-semibold shadow-md"
                 : "text-slate-600 hover:bg-slate-100 transition-all"
             }`
           }
         >
           <Plus className="w-4 h-4" />
           Add Expense
+        </NavLink>
+
+        {/* AI Assistant Button with blue–purple gradient */}
+        <NavLink
+          to="/app/chat"
+          className={({ isActive }) =>
+            `flex items-center gap-3 px-4 py-1.5 text-sm mt-3 rounded-lg ${
+              isActive
+                ? "bg-[linear-gradient(135deg,#3b82f6,#8b5cf6)] text-white font-semibold shadow-md"
+                : "text-slate-600 hover:bg-[linear-gradient(135deg,#dbeafe,#ede9fe)] transition-all"
+            }`
+          }
+        >
+          <MessageSquare className="w-4 h-4" />
+          AI Assistant
         </NavLink>
         <NavLink
           to="/app/profile"
@@ -99,6 +121,14 @@ const Sidebar: React.FC = () => {
 
       {/* User Info + Logout */}
       <div className="absolute bottom-6 left-6 flex flex-col items-start gap-4">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-2 text-red-600 font-semibold text-sm px-4 py-2 rounded-lg bg-red-50 hover:bg-red-100 hover:scale-[1.03] active:scale-[0.98] transition-all duration-200"
+        >
+          <LogOut className="w-4 h-4" />
+          Logout
+        </button>
+
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-bold">
             {user ? user.name.charAt(0).toUpperCase() : "?"}
