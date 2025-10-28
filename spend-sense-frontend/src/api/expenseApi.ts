@@ -16,7 +16,6 @@ export interface Category {
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
-
 export const fetchExpenses = async () => {
   const token =
     localStorage.getItem("spendsense_token") ||
@@ -27,6 +26,7 @@ export const fetchExpenses = async () => {
       "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
+    credentials: "include",
   });
 
   if (!res.ok) {
@@ -47,7 +47,6 @@ export const fetchExpenses = async () => {
     note: e.notes || "",
   }));
 };
-
 
 export const fetchCategories = async (): Promise<Category[]> => {
   const token =
