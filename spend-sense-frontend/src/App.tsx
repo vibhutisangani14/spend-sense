@@ -2,18 +2,18 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { AddExpense, Dashboard, EditExpense, SignIn, SignUp } from "./pages";
 import { MainLayout } from "./layouts";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import ChatPage from "./pages/ChatPage";
 
 export default function App() {
   return (
     <Routes>
-      {/* redirect root to signIn */}
       <Route path="/" element={<Navigate to="/signIn" replace />} />
 
       {/* auth routes */}
       <Route path="/signIn" element={<SignIn />} />
       <Route path="/signUp" element={<SignUp />} />
 
-      {/* protected routes */}
+      {/* protected (app) routes */}
       <Route
         path="/app"
         element={
@@ -25,9 +25,9 @@ export default function App() {
         <Route index element={<Dashboard />} />
         <Route path="addExpense" element={<AddExpense />} />
         <Route path="editExpense/:id" element={<EditExpense />} />
+        <Route path="chat" element={<ChatPage />} />
       </Route>
 
-      {/* fallback */}
       <Route path="*" element={<Navigate to="/signIn" replace />} />
     </Routes>
   );
