@@ -1,5 +1,12 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { AddExpense, Dashboard, EditExpense, SignIn, SignUp } from "./pages";
+import {
+  AddExpense,
+  Dashboard,
+  EditExpense,
+  Profile,
+  SignIn,
+  SignUp,
+} from "./pages";
 import { MainLayout } from "./layouts";
 import ProtectedRoute from "./routes/ProtectedRoute";
 
@@ -25,6 +32,7 @@ export default function App() {
         <Route index element={<Dashboard />} />
         <Route path="addExpense" element={<AddExpense />} />
         <Route path="editExpense/:id" element={<EditExpense />} />
+        <Route path="profile" element={<Profile />} />
       </Route>
 
       {/* fallback */}
