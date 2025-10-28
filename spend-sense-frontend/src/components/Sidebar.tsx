@@ -29,12 +29,21 @@ const Sidebar: React.FC = () => {
     }
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("spendsense_token");
-    localStorage.removeItem("spendsense_user");
-    navigate("/signIn");
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setUser(null);
+      localStorage.removeItem("spendsense_token");
+      localStorage.removeItem("spendsense_user");
+      navigate("/signIn");
+    } catch (error) {
+      if (error instanceof Error) {
+        // toast.error(error.message);
+      } else {
+        // toast.error("Error logging out");
+      }
+    }
   };
-
   return (
     <aside className="w-64 h-screen sticky top-0 bg-[#fafafa]">
       {/* Logo */}
@@ -43,7 +52,7 @@ const Sidebar: React.FC = () => {
           <Wallet className="w-5 h-5" />
         </div>
         <div>
-          <div className="font-bold text-lg">ExpenseFlow</div>
+          <div className="font-bold text-lg">SpendSense</div>
           <div className="text-xs text-slate-400">Track your spending</div>
         </div>
       </div>

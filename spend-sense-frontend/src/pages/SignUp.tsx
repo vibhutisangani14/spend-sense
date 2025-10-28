@@ -64,7 +64,7 @@ export default function SignUp() {
             <img
               src="../src/images/q.png"
               alt="Illustration"
-              className="absolute inset-0 w-full h-full object-contain p-10"
+              className="absolute inset-0 w-full h-full object-contain p-16 rounded-lg"
             />
           </div>
         </div>
