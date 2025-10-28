@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+
 import {
   LayoutDashboard,
   Plus,
@@ -31,7 +32,7 @@ const Sidebar: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      await logout();
+      // await logout();
       setUser(null);
       localStorage.removeItem("spendsense_token");
       localStorage.removeItem("spendsense_user");
