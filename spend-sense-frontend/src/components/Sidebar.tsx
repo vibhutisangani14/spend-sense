@@ -40,7 +40,7 @@ const Sidebar: React.FC = () => {
     }
   };
   return (
-    <aside className="w-64 h-screen sticky top-0 bg-[#fafafa]">
+    <aside className="w-64 h-screen sticky top-0 bg-[#fafafa] overflow-hidden">
       {/* Logo */}
       <div className="p-6 flex items-center gap-3">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-white">
@@ -85,15 +85,7 @@ const Sidebar: React.FC = () => {
       </nav>
 
       {/* User Info + Logout */}
-      <div className="absolute bottom-6 left-6 flex flex-col items-start gap-4">
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-2 text-red-600 font-semibold text-sm px-4 py-2 rounded-lg bg-red-50 hover:bg-red-100 hover:scale-[1.03] active:scale-[0.98] transition-all duration-200"
-        >
-          <LogOut className="w-4 h-4" />
-          Logout
-        </button>
-
+      <div className="absolute bottom-6 left-6 flex flex-col items-start gap-4 ">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-bold">
             {user ? user.name.charAt(0).toUpperCase() : "?"}
@@ -106,6 +98,15 @@ const Sidebar: React.FC = () => {
               {user?.email || "guest@example.com"}
             </div>
           </div>
+        </div>
+        <div className="w-54  rounded-xl hover:bg-red-100 hover:scale-[1.03] active:scale-[0.98] transition-all duration-200">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2  font-semibold text-sm px-2 py-2 rounded-lg "
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </button>
         </div>
       </div>
     </aside>

@@ -28,6 +28,7 @@ body {
 
 .pulse-badge {
   background: linear-gradient(90deg, #f0efff, #fff0fb);
+  opacity: 0.8;
 }
 
 .expense-item {

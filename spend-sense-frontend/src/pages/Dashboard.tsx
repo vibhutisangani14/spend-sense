@@ -2,7 +2,15 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import SummaryCard from "../components/SummaryCard";
 import ExpenseItem from "../components/ExpenseItem";
-import { Plus } from "lucide-react";
+import {
+  Plus,
+  RefreshCw,
+  DollarSign,
+  TrendingUp,
+  CreditCard,
+  Calendar,
+  Funnel,
+} from "lucide-react";
 import {
   PieChart,
   Pie,
@@ -17,7 +25,6 @@ import {
   CartesianGrid,
 } from "recharts";
 import { fetchExpenses, fetchCategories } from "../api/expenseApi";
-import { FcEmptyFilter } from "react-icons/fc";
 
 const COLORS = [
   "#7c3aed",
@@ -73,7 +80,7 @@ const Dashboard: React.FC = () => {
           title: e.title,
           amount: e.amount,
           category: e.categoryId?.name || e.category || "Other",
-          method: e.paymentMethod || "Unknown",
+          method: e.paymentMethodId?.name || e.paymentMethodId || "Unknown",
           date: e.date,
           note: e.notes || "",
         }));
@@ -181,15 +188,27 @@ const Dashboard: React.FC = () => {
           <h1 className="text-4xl font-bold bg-[linear-gradient(135deg,#5344e5,#7c4bed,#9035ea)] bg-clip-text text-transparent">
             Expense Dashboard
           </h1>
-          <p className="text-slate-400 mt-2">Track and manage your spending</p>
+          <p className="text-slate-400 mt-2">
+            Track and manage your spending
+            {`. ${expenses.length} expenses loaded`}
+          </p>
         </div>
-        <Link
-          to="/app/addExpense"
-          className="btn bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] text-white shadow-xl px-5 py-2 rounded-lg"
-        >
-          <Plus className="w-4 h-4" />
-          Add Expense
-        </Link>
+        <div>
+          <Link
+            to=""
+            className="btn bg-white text-black px-5 py-2 rounded-lg mr-3"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Refresh
+          </Link>
+          <Link
+            to="/app/addExpense"
+            className="btn bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] text-white shadow-xl px-5 py-2 rounded-lg"
+          >
+            <Plus className="w-4 h-4" />
+            Add Expense
+          </Link>
+        </div>
       </div>
 
       <div className="col-span-12 lg:col-span-8">
@@ -198,103 +217,70 @@ const Dashboard: React.FC = () => {
             title="Total Expenses"
             value={`€${total.toFixed(2)}`}
             subtitle={`${expenses.length} transactions`}
-            icon={
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-purple-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8c-1.657 0-3 1.343-3 3v5h6v-5c0-1.657-1.343-3-3-3z"
-                />
-              </svg>
-            }
+            icon={<DollarSign className="w-6 h-6 text-blue-600" />}
+            color="bg-blue-100"
           />
           <SummaryCard
             title="This Month"
             value={`€${thisMonthTotal.toFixed(2)}`}
             subtitle="First month"
-            icon={
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-purple-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 7V3m8 4V3M3 11h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-            }
+            icon={<Calendar className="w-6 h-6 text-purple-600" />}
+            color="bg-purple-100"
           />
           <SummaryCard
             title="Average Expense"
             value={`€${average.toFixed(2)}`}
-            icon={
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-pink-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M11 11V3m0 0L7 7m4-4 4 4M3 21h18"
-                />
-              </svg>
-            }
+            icon={<TrendingUp className="w-6 h-6 text-pink-400" />}
+            color="bg-pink-100"
           />
           <SummaryCard
             title="Payment Methods"
             value={paymentMethods.length.toString()}
             subtitle="Active methods"
-            icon={
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-cyan-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 10h18M7 15h.01M11 15h.01M15 15h.01"
-                />
-              </svg>
-            }
+            icon={<CreditCard className="w-6 h-6 text-cyan-400" />}
+            color="bg-cyan-100"
           />
         </div>
       </div>
 
       <div className="grid grid-cols-12 gap-6 mt-8 lg:col-span-12">
         <div className="p-6 bg-white rounded-xl card-shadow h-full lg:col-span-6">
-          <h2 className="font-semibold text-lg mb-2">📊 Spending Trends</h2>
+          <h2 className="font-semibold text-lg ">📊 Spending Trends</h2>
+          <p className="text-slate-600 mt-2 text-sm mb-2">
+            Last 6 months overview
+          </p>
           <ResponsiveContainer width="100%" height={320}>
             <BarChart
-              data={barData}
+              data={barData.slice(-6)} // show only last 6 months
               margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
             >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="amount" fill="#7c3aed" />
+              <defs>
+                <linearGradient id="purpleGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#8b5cf6" stopOpacity={1} />
+                  <stop offset="100%" stopColor="#a78bfa" stopOpacity={0.8} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis dataKey="month" tickLine={false} />
+              <YAxis tickLine={false} tickFormatter={(v) => `€${v}`} />
+              <Tooltip
+                formatter={(value) => [`€${value.toFixed(2)}`, "Amount"]}
+                cursor={{ fill: "rgba(124,58,237,0.1)" }}
+              />
+              <Bar
+                dataKey="amount"
+                fill="url(#purpleGradient)"
+                radius={[8, 8, 0, 0]}
+                barSize={40}
+              />
             </BarChart>
           </ResponsiveContainer>
+          <div className="text-center mt-3 text-slate-600 text-sm">
+            Total tracked:{" "}
+            <span className="font-medium text-slate-800">
+              €{barData.reduce((a, b) => a + b.amount, 0).toFixed(2)}
+            </span>
+          </div>
         </div>
 
         <div className="p-6 bg-white rounded-xl card-shadow h-full lg:col-span-6">
@@ -319,13 +305,13 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className="p-6 bg-white rounded-xl card-shadow mt-8">
+      <div className="p-6 bg-white rounded-xl card-shadow mt-8 mb-6">
         <div className="flex flex-wrap gap-2 items-center">
-          <FcEmptyFilter className="text-purple-600 h-6 w-6" />
+          <Funnel className="text-slate-400 h-5 w-5 " />
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="border rounded-lg px-4 py-2 text-sm text-slate-600"
+            className="border rounded-lg mx-2 px-4 py-2 text-sm text-slate-600"
           >
             <option value="all">All Categories</option>
             {categories.map((c) => (
@@ -355,16 +341,18 @@ const Dashboard: React.FC = () => {
           </select>
         </div>
       </div>
-
-      <div className="p-6 bg-white rounded-xl card-shadow mt-8">
-        {filteredExpenses.length > 0 ? (
-          filteredExpenses.map((e) => <ExpenseItem key={e._id} e={e} />)
-        ) : (
-          <div className="text-slate-400 text-sm">
-            No expenses match this filter.
-          </div>
-        )}
-      </div>
+      {filteredExpenses.length > 0 ? (
+        filteredExpenses.map((e) => (
+          <ExpenseItem
+            key={e._id}
+            e={{ ...e, method: e.method ?? "Unknown" }}
+          />
+        ))
+      ) : (
+        <div className="text-slate-400 text-sm">
+          No expenses match this filter.
+        </div>
+      )}
     </div>
   );
 };
