@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { LayoutDashboard, Plus, Wallet, LogOut } from "lucide-react";
+import { logout } from "../services/auth";
 
 interface User {
   _id: string;
@@ -23,12 +24,21 @@ const Sidebar: React.FC = () => {
     }
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("spendsense_token");
-    localStorage.removeItem("spendsense_user");
-    navigate("/signIn");
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setUser(null);
+      localStorage.removeItem("spendsense_token");
+      localStorage.removeItem("spendsense_user");
+      navigate("/signIn");
+    } catch (error) {
+      if (error instanceof Error) {
+        // toast.error(error.message);
+      } else {
+        // toast.error("Error logging out");
+      }
+    }
   };
-
   return (
     <aside className="w-64 h-screen sticky top-0 bg-[#fafafa]">
       {/* Logo */}

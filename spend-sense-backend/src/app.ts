@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { errorHandler } from "#middleware";
+import cookieParser from "cookie-parser";
 import {
   categoryRouter,
   userRouter,
@@ -16,9 +17,14 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors());
-app.use(express.json());
-
+app.use(
+  cors({
+    origin: process.env.CLIENT_BASE_URL, // for use with credentials, origin(s) need to be specified
+    credentials: true, // sends and receives secure cookies
+    exposedHeaders: ["WWW-Authenticate"], // needed to send the 'refresh trigger''
+  })
+);
+app.use(express.json(), cookieParser());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/categories", categoryRouter);

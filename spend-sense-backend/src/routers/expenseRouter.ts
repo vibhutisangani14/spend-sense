@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { validateBody } from "#middleware";
 import { expenseInputSchema } from "#schemas";
+import { authenticate, hasRole } from "#middleware";
 import {
   getAllExpenses,
   createExpense,
@@ -13,12 +14,12 @@ const expenseRouter = Router();
 
 expenseRouter
   .route("/")
-  .get(getAllExpenses)
-  .post(validateBody(expenseInputSchema), createExpense);
+  .get(authenticate, getAllExpenses)
+  .post(authenticate, validateBody(expenseInputSchema), createExpense);
 expenseRouter
   .route("/:id")
-  .get(getExpenseById)
-  .put(validateBody(expenseInputSchema), updateExpenseById)
-  .delete(deleteExpenseById);
+  .get(authenticate, getExpenseById)
+  .put(authenticate, validateBody(expenseInputSchema), updateExpenseById)
+  .delete(authenticate, deleteExpenseById);
 
 export default expenseRouter;

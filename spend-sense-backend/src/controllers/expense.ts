@@ -20,7 +20,10 @@ export const getAllExpenses: RequestHandler<{}, ExpenseDTO[]> = async (
   req,
   res
 ) => {
-  const allExpenses = await Expense.find()
+  const userId = req.user?.id;
+  if (!userId) throw new Error("Unauthorized", { cause: { status: 401 } });
+
+  const allExpenses = await Expense.find({ userId })
     .populate<{ categoryId: PopulatedCategoryDTO }>("categoryId")
     .populate<{ userId: PopulatedUserDTO }>("userId")
     .populate<{ paymentMethodId: PopulatedPaymentMethodDTO }>("paymentMethodId")
@@ -33,13 +36,30 @@ export const createExpense: RequestHandler<
   ExpenseDTO,
   ExpenseInputDTO
 > = async (req, res) => {
-  const newExpense = await Expense.create<ExpenseInputDTO>(req.body);
-  const populatedExpense = await Expense.findById(newExpense._id)
-    .populate<{ categoryId: PopulatedCategoryDTO }>("categoryId")
-    .populate<{ userId: PopulatedUserDTO }>("userId")
-    .populate<{ paymentMethodId: PopulatedPaymentMethodDTO }>("paymentMethodId")
-    .lean<ExpenseDTO>();
-  res.json(populatedExpense!);
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      throw new Error("Unauthorized", { cause: { status: 401 } });
+    }
+
+    // merge userId into the request body
+    const expenseData: ExpenseInputDTO = { ...req.body, userId };
+
+    const newExpense = await Expense.create(expenseData);
+
+    const populatedExpense = await Expense.findById(newExpense._id)
+      .populate<{ categoryId: PopulatedCategoryDTO }>("categoryId")
+      .populate<{ userId: PopulatedUserDTO }>("userId")
+      .populate<{ paymentMethodId: PopulatedPaymentMethodDTO }>(
+        "paymentMethodId"
+      )
+      .lean<ExpenseDTO>();
+
+    res.status(201).json(populatedExpense!);
+  } catch (error) {
+    console.error(error);
+    throw new Error("Server error", { cause: { status: 500 } });
+  }
 };
 
 export const getExpenseById: RequestHandler<

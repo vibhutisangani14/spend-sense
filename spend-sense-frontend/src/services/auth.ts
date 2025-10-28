@@ -35,3 +35,9 @@ export async function login(
   localStorage.setItem("spendsense_user", JSON.stringify(data.user));
   return data;
 }
+
+export async function logout(): Promise<AuthResponse> {
+  const { data } = await api.delete<AuthResponse>("/auth/logout", {});
+
+  return data;
+}

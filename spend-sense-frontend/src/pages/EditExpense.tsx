@@ -53,9 +53,15 @@ const EditExpense: React.FC = () => {
     const fetchData = async () => {
       try {
         const [expenseRes, categoryRes, paymentRes] = await Promise.all([
-          axios.get(`http://localhost:3000/api/expenses/${id}`),
-          axios.get(`http://localhost:3000/api/categories`),
-          axios.get(`http://localhost:3000/api/paymentMethods`),
+          axios.get(`http://localhost:3000/api/expenses/${id}`, {
+            withCredentials: true,
+          }),
+          axios.get(`http://localhost:3000/api/categories`, {
+            withCredentials: true,
+          }),
+          axios.get(`http://localhost:3000/api/paymentMethods`, {
+            withCredentials: true,
+          }),
         ]);
 
         const expenseData = expenseRes.data;
@@ -118,6 +124,7 @@ const EditExpense: React.FC = () => {
           headers: {
             "Content-Type": "application/json",
           },
+          withCredentials: true,
         }
       );
 
