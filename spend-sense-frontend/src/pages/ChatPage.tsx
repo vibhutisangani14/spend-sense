@@ -39,7 +39,7 @@ const ChatPage: React.FC = () => {
 
   return (
     <div className="flex justify-center items-center h-full bg-white p-10">
-      <div className="w-full max-w-5xl bg-white rounded-3xl shadow-[0_0_45px_rgba(0,0,0,0.07)] border border-gray-100 flex flex-col p-10">
+      <div className="w-full  h-head max-w-5xl bg-white rounded-3xl shadow-[0_0_45px_rgba(0,0,0,0.07)] border border-gray-100 flex flex-col p-10">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-r from-indigo-400 to-purple-500 flex items-center justify-center text-white shadow-md">

@@ -32,7 +32,7 @@ const Sidebar: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      // await logout();
+      await logout();
       setUser(null);
       localStorage.removeItem("spendsense_token");
       localStorage.removeItem("spendsense_user");
