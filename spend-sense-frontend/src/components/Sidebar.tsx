@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Plus, Wallet, LogOut } from "lucide-react";
-import { logout } from "../services/auth";
+
+import {
+  LayoutDashboard,
+  Plus,
+  Wallet,
+  LogOut,
+  MessageSquare,
+} from "lucide-react";
 
 interface User {
   _id: string;
@@ -26,7 +32,7 @@ const Sidebar: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      await logout();
+      // await logout();
       setUser(null);
       localStorage.removeItem("spendsense_token");
       localStorage.removeItem("spendsense_user");
@@ -60,7 +66,7 @@ const Sidebar: React.FC = () => {
           className={({ isActive }) =>
             `flex items-center gap-3 px-4 py-1.5 rounded-xl text-sm ${
               isActive
-                ? "bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] text-white font-semibold"
+                ? "bg-[linear-gradient(135deg,#6366f1,#8b5cf6)] text-white font-semibold shadow-md"
                 : "text-slate-600 hover:bg-slate-100 transition-all"
             }`
           }
@@ -74,13 +80,28 @@ const Sidebar: React.FC = () => {
           className={({ isActive }) =>
             `flex items-center gap-3 px-4 py-1.5 text-sm mt-3 rounded-lg ${
               isActive
-                ? "bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] text-white font-semibold"
+                ? "bg-[linear-gradient(135deg,#6366f1,#8b5cf6)] text-white font-semibold shadow-md"
                 : "text-slate-600 hover:bg-slate-100 transition-all"
             }`
           }
         >
           <Plus className="w-4 h-4" />
           Add Expense
+        </NavLink>
+
+        {/* AI Assistant Button with blue–purple gradient */}
+        <NavLink
+          to="/app/chat"
+          className={({ isActive }) =>
+            `flex items-center gap-3 px-4 py-1.5 text-sm mt-3 rounded-lg ${
+              isActive
+                ? "bg-[linear-gradient(135deg,#3b82f6,#8b5cf6)] text-white font-semibold shadow-md"
+                : "text-slate-600 hover:bg-[linear-gradient(135deg,#dbeafe,#ede9fe)] transition-all"
+            }`
+          }
+        >
+          <MessageSquare className="w-4 h-4" />
+          AI Assistant
         </NavLink>
       </nav>
 
