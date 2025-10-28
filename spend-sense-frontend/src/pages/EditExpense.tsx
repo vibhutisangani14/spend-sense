@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Save, ArrowLeft } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface Category {
   _id: string;
@@ -140,146 +141,159 @@ const EditExpense: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white py-3 px-6 flex flex-col mx-18 justify-center">
-      <div className="flex flex-col items-start justify-between">
-        <button
-          type="button"
-          onClick={() => navigate("/app")}
-          className="flex items-center gap-2 text-black font-medium text-sm px-4 py-2 hover:bg-gray-100 rounded-md cursor-pointer"
+      <div className="flex flex-col items-start justify-between mt-6">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
         >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Dashboard
-        </button>
+          <button
+            type="button"
+            onClick={() => navigate("/app")}
+            className="flex items-center gap-2 text-black font-medium text-sm px-4 py-2 hover:bg-gray-100 rounded-md cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Dashboard
+          </button>
 
-        <h1 className="text-4xl font-bold bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] bg-clip-text text-transparent my-2">
-          Edit Expense
-        </h1>
-        <p className="text-gray-600 mb-8">Update your expense details</p>
+          <h1 className="text-4xl font-bold bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] bg-clip-text text-transparent my-2">
+            Edit Expense
+          </h1>
+          <p className="text-gray-600">Update your expense details</p>
+        </motion.div>
       </div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+      >
+        <div className="w-full bg-white rounded-2xl shadow-lg">
+          <h2 className="text-2xl font-semibold mt-3 mb-3 py-1.5 px-6">
+            Expense Details
+          </h2>
+          <div className="border border-gray-100"></div>
 
-      <div className="w-full bg-white rounded-2xl shadow-lg">
-        <h2 className="text-2xl font-semibold mt-3 mb-3 py-1.5 px-6">
-          Expense Details
-        </h2>
-        <div className="border border-gray-100"></div>
-
-        <form onSubmit={handleSubmit} className="space-y-6 p-6">
-          {/* Title + Amount */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium mb-2">Title *</label>
-              <input
-                type="text"
-                name="title"
-                placeholder="e.g., Starbucks coffee, Uber ride, Netflix subscription"
-                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-gray-950 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-                value={expense.title}
-                onChange={handleChange}
-                required
-              />
+          <form onSubmit={handleSubmit} className="space-y-6 p-6">
+            {/* Title + Amount */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Title *
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  placeholder="e.g., Starbucks coffee, Uber ride, Netflix subscription"
+                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-gray-950 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                  value={expense.title}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Amount (€) *
+                </label>
+                <input
+                  type="number"
+                  name="amount"
+                  step="0.01"
+                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-gray-950 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                  value={expense.amount}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
             </div>
+
+            {/* Category + Date */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Category *
+                </label>
+                <select
+                  name="categoryId"
+                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  value={expense.categoryId}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select Category</option>
+                  {categories.map((cat) => (
+                    <option key={cat._id} value={cat._id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Date *</label>
+                <input
+                  type="date"
+                  name="date"
+                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                  value={expense.date}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Payment method */}
             <div>
               <label className="block text-sm font-medium mb-2">
-                Amount (€) *
-              </label>
-              <input
-                type="number"
-                name="amount"
-                step="0.01"
-                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-gray-950 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-                value={expense.amount}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
-
-          {/* Category + Date */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Category *
+                Payment Method *
               </label>
               <select
-                name="categoryId"
+                name="paymentMethodId"
                 className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                value={expense.categoryId}
+                value={expense.paymentMethodId}
                 onChange={handleChange}
                 required
               >
-                <option value="">Select Category</option>
-                {categories.map((cat) => (
-                  <option key={cat._id} value={cat._id}>
-                    {cat.name}
+                <option value="">Select Payment Method</option>
+                {paymentMethods.map((method) => (
+                  <option key={method._id} value={method._id}>
+                    {method.name}
                   </option>
                 ))}
               </select>
             </div>
+
+            {/* Notes */}
             <div>
-              <label className="block text-sm font-medium mb-2">Date *</label>
-              <input
-                type="date"
-                name="date"
+              <label className="block text-sm font-medium mb-2">Notes</label>
+              <textarea
+                name="notes"
+                placeholder="Add any additional details..."
                 className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-sm focus:outline-none focus:ring-2 focus:ring-black"
-                value={expense.date}
+                rows={3}
+                value={expense.notes}
                 onChange={handleChange}
-                required
               />
             </div>
-          </div>
 
-          {/* Payment method */}
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Payment Method *
-            </label>
-            <select
-              name="paymentMethodId"
-              className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              value={expense.paymentMethodId}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select Payment Method</option>
-              {paymentMethods.map((method) => (
-                <option key={method._id} value={method._id}>
-                  {method.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Notes */}
-          <div>
-            <label className="block text-sm font-medium mb-2">Notes</label>
-            <textarea
-              name="notes"
-              placeholder="Add any additional details..."
-              className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-sm focus:outline-none focus:ring-2 focus:ring-black"
-              rows={3}
-              value={expense.notes}
-              onChange={handleChange}
-            />
-          </div>
-
-          {/* Action buttons */}
-          <div className="flex flex-row gap-2">
-            <button
-              type="button"
-              className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-sm text-black font-semibold hover:bg-indigo-700 hover:text-white transition"
-              onClick={() => navigate("/app")}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="w-full bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] flex items-center justify-center gap-2 text-sm text-white font-semibold py-2.5 rounded-lg hover:opacity-90 transition"
-            >
-              <Save className="w-4 h-4" />
-              Save Expense
-            </button>
-          </div>
-        </form>
-      </div>
+            {/* Action buttons */}
+            <div className="flex flex-row gap-2">
+              <button
+                type="button"
+                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-sm text-black font-semibold hover:bg-indigo-700 hover:text-white transition"
+                onClick={() => navigate("/app")}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="w-full bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] flex items-center justify-center gap-2 text-sm text-white font-semibold py-2.5 rounded-lg hover:opacity-90 transition"
+              >
+                <Save className="w-4 h-4" />
+                Save Expense
+              </button>
+            </div>
+          </form>
+        </div>
+      </motion.div>
     </div>
   );
 };

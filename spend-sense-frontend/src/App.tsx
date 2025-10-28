@@ -1,5 +1,12 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { AddExpense, Dashboard, EditExpense, SignIn, SignUp } from "./pages";
+import {
+  AddExpense,
+  Dashboard,
+  EditExpense,
+  Profile,
+  SignIn,
+  SignUp,
+} from "./pages";
 import { MainLayout } from "./layouts";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import ChatPage from "./pages/ChatPage";
@@ -26,6 +33,7 @@ export default function App() {
         <Route path="addExpense" element={<AddExpense />} />
         <Route path="editExpense/:id" element={<EditExpense />} />
         <Route path="chat" element={<ChatPage />} />
+        <Route path="profile" element={<Profile />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/signIn" replace />} />
