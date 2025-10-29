@@ -4,6 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { errorHandler } from "#middleware";
 import cookieParser from "cookie-parser";
+
 import {
   categoryRouter,
   userRouter,
