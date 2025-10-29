@@ -51,7 +51,7 @@ const Sidebar: React.FC = () => {
     <aside className="w-64 h-screen sticky top-0 bg-[#fafafa] overflow-hidden">
       {/* Logo */}
       <div className="p-6 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-white">
+        <div className="w-10 h-10 rounded-xl shadow-lg bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-white shadow-indigo-500/30">
           <Wallet className="w-5 h-5" />
         </div>
         <div>
@@ -66,10 +66,10 @@ const Sidebar: React.FC = () => {
           to="/app"
           end
           className={({ isActive }) =>
-            `flex items-center gap-3 px-4 py-1.5 rounded-xl text-sm ${
+            `flex items-center gap-3 px-4 py-1.5 rounded-xl text-sm  ${
               isActive
-                ? "bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] text-white font-semibold shadow-md"
-                : "text-slate-600 hover:bg-slate-100 transition-all"
+                ? "bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] text-white font-semibold shadow-lg shadow-indigo-500/30"
+                : "text-slate-600 hover:bg-[linear-gradient(135deg,#dbeafe,#ede9fe)] transition-all"
             }`
           }
         >
@@ -80,10 +80,10 @@ const Sidebar: React.FC = () => {
         <NavLink
           to="/app/addExpense"
           className={({ isActive }) =>
-            `flex items-center gap-3 px-4 py-1.5 text-sm mt-3 rounded-lg ${
+            `flex items-center gap-3 px-4 py-1.5 text-sm mt-3 rounded-xl ${
               isActive
-                ? "bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] text-white font-semibold shadow-md"
-                : "text-slate-600 hover:bg-slate-100 transition-all"
+                ? "bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] text-white font-semibold shadow-lg shadow-indigo-500/30"
+                : "text-slate-600 hover:bg-[linear-gradient(135deg,#dbeafe,#ede9fe)] transition-all"
             }`
           }
         >
@@ -95,9 +95,9 @@ const Sidebar: React.FC = () => {
         <NavLink
           to="/app/chat"
           className={({ isActive }) =>
-            `flex items-center gap-3 px-4 py-1.5 text-sm mt-3 rounded-lg ${
+            `flex items-center gap-3 px-4 py-1.5 text-sm mt-3 rounded-xl ${
               isActive
-                ? "bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] text-white font-semibold shadow-md"
+                ? "bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] text-white font-semibold shadow-lg shadow-indigo-500/30"
                 : "text-slate-600 hover:bg-[linear-gradient(135deg,#dbeafe,#ede9fe)] transition-all"
             }`
           }
@@ -108,10 +108,10 @@ const Sidebar: React.FC = () => {
         <NavLink
           to="/app/profile"
           className={({ isActive }) =>
-            `flex items-center gap-3 px-4 py-1.5 text-sm mt-3 rounded-lg ${
+            `flex items-center gap-3 px-4 py-1.5 text-sm mt-3 rounded-xl ${
               isActive
-                ? "bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] text-white font-semibold"
-                : "text-slate-600 hover:bg-slate-100 transition-all"
+                ? "bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] text-white font-semibold shadow-lg shadow-indigo-500/30"
+                : "text-slate-600 hover:bg-[linear-gradient(135deg,#dbeafe,#ede9fe)] transition-all"
             }`
           }
         >

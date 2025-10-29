@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import SummaryCard from "../components/SummaryCard";
 import ExpenseItem from "../components/ExpenseItem";
+import { motion } from "framer-motion";
 import {
   Plus,
   RefreshCw,
@@ -182,35 +183,41 @@ const Dashboard: React.FC = () => {
     return <div className="p-6 text-red-500">Error loading data: {error}</div>;
 
   return (
-    <div className="flex-1 p-6 lg:p-10">
+    <div className="flex-1 p-6 lg:p-10 bg-[#f7f8f9]">
       <div className="flex items-center mb-6 justify-between">
-        <div>
-          <h1 className="text-4xl font-bold bg-[linear-gradient(135deg,#5344e5,#7c4bed,#9035ea)] bg-clip-text text-transparent">
-            Expense Dashboard
-          </h1>
-          <p className="text-slate-400 mt-2">
-            Track and manage your spending
-            {`. ${expenses.length} expenses loaded`}
-          </p>
-        </div>
-        <div>
-          <Link
-            to=""
-            className="btn bg-white text-black px-5 py-2 rounded-lg mr-3"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Refresh
-          </Link>
-          <Link
-            to="/app/addExpense"
-            className="btn bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] text-white shadow-xl px-5 py-2 rounded-lg"
-          >
-            <Plus className="w-4 h-4" />
-            Add Expense
-          </Link>
-        </div>
-      </div>
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col md:flex-row justify-between items-start md:items-center w-full gap-4"
+        >
+          <div className="flex-1">
+            <h1 className="text-4xl font-bold bg-[linear-gradient(135deg,#5344e5,#7c4bed,#9035ea)] bg-clip-text text-transparent">
+              Expense Dashboard
+            </h1>
+            <p className="text-slate-400 mt-2">
+              Track and manage your spending
+              {`. ${expenses.length} expenses loaded`}
+            </p>
+          </div>
 
+          <div className="flex justify-end gap-3 w-full md:w-auto">
+            <Link
+              to=""
+              className="btn bg-white text-black px-5 py-2 rounded-lg flex items-center gap-2"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Refresh
+            </Link>
+            <Link
+              to="/app/addExpense"
+              className="btn border-none bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] text-white shadow-lg shadow-indigo-500/30 px-5 py-2 rounded-lg flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Add Expense
+            </Link>
+          </div>
+        </motion.div>
+      </div>
       <div className="col-span-12 lg:col-span-8">
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
           <SummaryCard
@@ -235,7 +242,7 @@ const Dashboard: React.FC = () => {
           />
           <SummaryCard
             title="Payment Methods"
-            value={paymentMethods.length.toString()}
+            value={paymentMethods.length.toFixed(2)}
             subtitle="Active methods"
             icon={<CreditCard className="w-6 h-6 text-cyan-400" />}
             color="bg-cyan-100"
@@ -243,65 +250,83 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-12 gap-6 mt-8 lg:col-span-12">
-        <div className="p-6 bg-white rounded-xl card-shadow h-full lg:col-span-6">
-          <h2 className="font-semibold text-lg ">📊 Spending Trends</h2>
-          <p className="text-slate-600 mt-2 text-sm mb-2">
-            Last 6 months overview
-          </p>
-          <ResponsiveContainer width="100%" height={320}>
-            <BarChart
-              data={barData.slice(-6)} // show only last 6 months
-              margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
-            >
-              <defs>
-                <linearGradient id="purpleGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#8b5cf6" stopOpacity={1} />
-                  <stop offset="100%" stopColor="#a78bfa" stopOpacity={0.8} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="month" tickLine={false} />
-              <YAxis tickLine={false} tickFormatter={(v) => `€${v}`} />
-              <Tooltip
-                formatter={(value) => [`€${value.toFixed(2)}`, "Amount"]}
-                cursor={{ fill: "rgba(124,58,237,0.1)" }}
-              />
-              <Bar
-                dataKey="amount"
-                fill="url(#purpleGradient)"
-                radius={[8, 8, 0, 0]}
-                barSize={40}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-          <div className="text-center mt-3 text-slate-600 text-sm">
-            Total tracked:{" "}
-            <span className="font-medium text-slate-800">
-              €{barData.reduce((a, b) => a + b.amount, 0).toFixed(2)}
-            </span>
-          </div>
+      <div className="grid grid-cols-12 gap-6 mt-3 lg:col-span-12">
+        <div className="p-6 bg-white rounded-xl shadow-xl shadow-gray-400/30  h-full lg:col-span-6">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <h2 className="font-semibold text-lg ">📊 Spending Trends</h2>
+            <p className="text-slate-600 mt-2 text-sm mb-2">
+              Last 6 months overview
+            </p>
+            <ResponsiveContainer width="100%" height={320}>
+              <BarChart
+                data={barData.slice(-6)} // show only last 6 months
+                margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+              >
+                <defs>
+                  <linearGradient
+                    id="purpleGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="0%" stopColor="#8b5cf6" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#a78bfa" stopOpacity={0.8} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="month" tickLine={false} />
+                <YAxis tickLine={false} tickFormatter={(v) => `€${v}`} />
+                <Tooltip
+                  formatter={(value) => [`€${value.toFixed(2)}`, "Amount"]}
+                  cursor={{ fill: "rgba(124,58,237,0.1)" }}
+                />
+                <Bar
+                  dataKey="amount"
+                  fill="url(#purpleGradient)"
+                  radius={[8, 8, 0, 0]}
+                  barSize={40}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+            <div className="text-center mt-3 text-slate-600 text-sm">
+              Total tracked:{" "}
+              <span className="font-medium text-slate-800">
+                €{barData.reduce((a, b) => a + b.amount, 0).toFixed(2)}
+              </span>
+            </div>
+          </motion.div>
         </div>
 
-        <div className="p-6 bg-white rounded-xl card-shadow h-full lg:col-span-6">
-          <h2 className="font-semibold text-lg mb-2">Spending by Category</h2>
-          <ResponsiveContainer width="100%" height={320}>
-            <PieChart>
-              <Pie
-                data={pieData}
-                dataKey="value"
-                nameKey="name"
-                outerRadius={90}
-                label
-              >
-                {pieData.map((entry, index) => (
-                  <Cell key={entry.name + index} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
+        <div className="p-6 bg-white rounded-xl shadow-xl shadow-gray-400/30  h-full lg:col-span-6">
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            <h2 className="font-semibold text-lg mb-2">Spending by Category</h2>
+            <ResponsiveContainer width="100%" height={320}>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  dataKey="value"
+                  nameKey="name"
+                  outerRadius={90}
+                  label
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell key={entry.name + index} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </motion.div>
         </div>
       </div>
 
