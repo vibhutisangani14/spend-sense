@@ -56,10 +56,10 @@ const AddExpense: React.FC = () => {
     const fetchData = async () => {
       try {
         const [categoryRes, paymentRes] = await Promise.all([
-          axios.get(`http://localhost:3000/api/categories`, {
+          axios.get(`${import.meta.env.VITE_API_URL}/categories`, {
             withCredentials: true,
           }),
-          axios.get(`http://localhost:3000/api/paymentMethods`, {
+          axios.get(`${import.meta.env.VITE_API_URL}/paymentMethods`, {
             withCredentials: true,
           }),
         ]);
@@ -111,7 +111,7 @@ const AddExpense: React.FC = () => {
       };
 
       const response = await axios.post(
-        `http://localhost:3000/api/expenses`,
+        `${import.meta.env.VITE_API_URL}/expenses`,
         payload,
         {
           headers: { "Content-Type": "application/json" },

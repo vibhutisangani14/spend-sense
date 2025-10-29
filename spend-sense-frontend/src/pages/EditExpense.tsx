@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Save, ArrowLeft } from "lucide-react";
@@ -30,10 +30,8 @@ const EditExpense: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-
   const [categories, setCategories] = useState<Category[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
-
   const [expense, setExpense] = useState<Expense>({
     title: "",
     amount: 0,
@@ -44,23 +42,19 @@ const EditExpense: React.FC = () => {
     userId: "",
     receipt: null,
   });
-
   const [userId, setUserId] = useState<string>("");
 
-  //Fetch expense, categories, and payment methods
   useEffect(() => {
-    console.log(id);
-
     const fetchData = async () => {
       try {
         const [expenseRes, categoryRes, paymentRes] = await Promise.all([
-          axios.get(`http://localhost:3000/api/expenses/${id}`, {
+          axios.get(`${import.meta.env.VITE_API_URL}/expenses/${id}`, {
             withCredentials: true,
           }),
-          axios.get(`http://localhost:3000/api/categories`, {
+          axios.get(`${import.meta.env.VITE_API_URL}/categories`, {
             withCredentials: true,
           }),
-          axios.get(`http://localhost:3000/api/paymentMethods`, {
+          axios.get(`${import.meta.env.VITE_API_URL}/paymentMethods`, {
             withCredentials: true,
           }),
         ]);
@@ -79,7 +73,6 @@ const EditExpense: React.FC = () => {
         });
 
         setUserId(expenseData.userId?._id || "");
-
         setCategories(categoryRes.data);
         setPaymentMethods(paymentRes.data);
       } catch (err) {
@@ -92,7 +85,6 @@ const EditExpense: React.FC = () => {
     fetchData();
   }, [id]);
 
-  // Input change handler
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -102,11 +94,9 @@ const EditExpense: React.FC = () => {
     setExpense((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Submit handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // JSON payload
       const payload = {
         title: expense.title,
         amount: Number(expense.amount),
@@ -116,15 +106,12 @@ const EditExpense: React.FC = () => {
         notes: expense.notes || "",
         userId,
       };
-      console.log("Sending payload:", payload);
 
       const response = await axios.put(
-        `http://localhost:3000/api/expenses/${id}`,
+        `${import.meta.env.VITE_API_URL}/expenses/${id}`,
         payload,
         {
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           withCredentials: true,
         }
       );
@@ -174,7 +161,6 @@ const EditExpense: React.FC = () => {
           <div className="border border-gray-100"></div>
 
           <form onSubmit={handleSubmit} className="space-y-6 p-6">
-            {/* Title + Amount */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium mb-2">
@@ -206,7 +192,6 @@ const EditExpense: React.FC = () => {
               </div>
             </div>
 
-            {/* Category + Date */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium mb-2">
@@ -240,7 +225,6 @@ const EditExpense: React.FC = () => {
               </div>
             </div>
 
-            {/* Payment method */}
             <div>
               <label className="block text-sm font-medium mb-2">
                 Payment Method *
@@ -261,7 +245,6 @@ const EditExpense: React.FC = () => {
               </select>
             </div>
 
-            {/* Notes */}
             <div>
               <label className="block text-sm font-medium mb-2">Notes</label>
               <textarea
@@ -274,7 +257,6 @@ const EditExpense: React.FC = () => {
               />
             </div>
 
-            {/* Action buttons */}
             <div className="flex flex-row gap-2">
               <button
                 type="button"

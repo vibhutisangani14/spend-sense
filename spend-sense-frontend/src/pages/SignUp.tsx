@@ -58,7 +58,6 @@ export default function SignUp() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f4f3f8] px-4">
       <div className="w-full max-w-5xl bg-white rounded-3xl shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
-        {/* Left visual panel */}
         <div className="relative hidden md:block bg-gradient-to-b from-[#efeafd] to-[#f6f5ff]">
           <div className="absolute inset-0 flex items-center justify-center p-10">
             <img
@@ -69,7 +68,6 @@ export default function SignUp() {
           </div>
         </div>
 
-        {/* Right form panel */}
         <div className="p-8 md:p-10">
           <div className="flex items-center justify-end mb-6">
             <div className="text-sm text-gray-500">
