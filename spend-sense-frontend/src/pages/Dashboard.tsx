@@ -80,7 +80,7 @@ const Dashboard: React.FC = () => {
           title: e.title,
           amount: e.amount,
           category: e.categoryId?.name || e.category || "Other",
-          method: e.paymentMethodId?.name || e.paymentMethodId || "Unknown",
+          method: e.method || "Unknown",
           date: e.date,
           note: e.notes || "",
         }));
@@ -342,12 +342,7 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
       {filteredExpenses.length > 0 ? (
-        filteredExpenses.map((e) => (
-          <ExpenseItem
-            key={e._id}
-            e={{ ...e, method: e.method ?? "Unknown" }}
-          />
-        ))
+        filteredExpenses.map((e) => <ExpenseItem key={e._id} e={e} />)
       ) : (
         <div className="text-slate-400 text-sm">
           No expenses match this filter.

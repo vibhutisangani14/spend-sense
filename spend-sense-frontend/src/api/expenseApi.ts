@@ -4,7 +4,7 @@ export interface ExpenseResponse {
   amount: number;
   categoryId?: { name: string };
   userId?: { name: string };
-  paymentMethod?: string;
+  paymentMethodId?: { name: string };
   date: string;
   notes?: string;
 }
@@ -42,7 +42,7 @@ export const fetchExpenses = async () => {
     title: e.title,
     amount: e.amount,
     category: e.categoryId?.name || "Uncategorized",
-    method: e.paymentMethod || "Unknown",
+    method: e.paymentMethodId?.name || "Unknown",
     date: e.date,
     note: e.notes || "",
   }));
