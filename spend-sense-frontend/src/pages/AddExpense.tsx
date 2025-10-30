@@ -156,7 +156,7 @@ const AddExpense: React.FC = () => {
         ...expense,
         amount: Number(expense.amount),
         userId: user?._id,
-        receipt,
+        receipt: receipt || "",
       };
 
       const response = await axios.post(
