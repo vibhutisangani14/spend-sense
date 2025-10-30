@@ -314,8 +314,16 @@ const Dashboard: React.FC = () => {
                     <Cell key={entry.name + index} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip />
-                <Legend />
+                <Tooltip
+                  formatter={(value: number) => `€${value.toFixed(2)}`}
+                />
+                <Legend
+                  height={10}
+                  wrapperStyle={{
+                    fontSize: "14px",
+                    fontWeight: "500",
+                  }}
+                />
               </PieChart>
             </ResponsiveContainer>
           </motion.div>
