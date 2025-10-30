@@ -12,7 +12,7 @@ import {
 } from "react-icons/fc";
 import { MdFastfood } from "react-icons/md";
 import { GiShoppingCart } from "react-icons/gi";
-import { Pencil } from "lucide-react";
+import { Pencil, Receipt } from "lucide-react";
 
 interface APIExpense {
   e: {
@@ -23,6 +23,7 @@ interface APIExpense {
     method: string;
     date: string;
     note?: string;
+    receipt?: string;
   };
 }
 
@@ -48,6 +49,46 @@ const ExpenseItem: React.FC<APIExpense> = ({ e }) => {
     navigate(`/app/editExpense/${e._id}`);
   };
 
+  const handleReceiptDownload = (receiptBase64: string, title?: string) => {
+    if (!receiptBase64) return;
+
+    try {
+      // Extract MIME type and base64 data
+      const matches = receiptBase64.match(/^data:(.*?);base64,(.*)$/);
+      if (!matches) {
+        console.error("Invalid base64 format");
+        return;
+      }
+
+      const mimeType = matches[1]; // e.g. "image/jpeg"
+      const base64Data = matches[2];
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: mimeType });
+
+      // Generate a downloadable URL
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+
+      const extension = mimeType.split("/")[1] || "file";
+      link.download = `${title || "receipt"}.${extension}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("❌ Failed to download receipt:", err);
+    }
+  };
+
   return (
     <div className="flex items-center justify-between p-4 bg-white expense-item card-shadow mb-4">
       <div className="flex items-center gap-4">
@@ -71,6 +112,18 @@ const ExpenseItem: React.FC<APIExpense> = ({ e }) => {
       </div>
       <div className="flex items-center gap-4 text-right">
         <div className="font-semibold">€{e.amount.toFixed(2)}</div>
+        {e.receipt && (
+          <button
+            type="button"
+            onClick={() =>
+              e.receipt && handleReceiptDownload(e.receipt, e.title)
+            }
+            title="Download Receipt"
+            className="hover:text-purple-600 transition"
+          >
+            <Receipt size={20} />
+          </button>
+        )}
 
         <button type="button" onClick={handleEdit}>
           <Pencil size={20} />

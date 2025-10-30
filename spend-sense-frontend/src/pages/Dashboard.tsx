@@ -83,6 +83,7 @@ const Dashboard: React.FC = () => {
           method: e.method || "Unknown",
           date: e.date,
           note: e.notes || "",
+          receipt: e.receipt || "",
         }));
 
         setExpenses(mapped);
