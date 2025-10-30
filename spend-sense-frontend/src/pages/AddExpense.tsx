@@ -28,13 +28,17 @@ interface User {
   name: string;
   email: string;
 }
+interface PredictedCategory {
+  categoryId: string;
+  categoryName: string;
+}
 const AddExpense: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [receipt, setReceipt] = useState<File | null>(null);
-  const [prediction, setPrediction] = useState<string | null>(null);
+  const [prediction, setPrediction] = useState<PredictedCategory | null>(null);
   const [loadingCategory, setLoadingCategory] = useState(false);
   const [predictionTimeout, setPredictionTimeout] = useState<number | null>(
     null
@@ -50,6 +54,7 @@ const AddExpense: React.FC = () => {
     userId: "",
   });
   const [user, setUser] = useState<User | null>(null);
+  const API_BASE = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const storedUser = localStorage.getItem("spendsense_user");
@@ -99,6 +104,16 @@ const AddExpense: React.FC = () => {
     fetchData();
   }, []);
 
+  const handleAcceptSuggestion = () => {
+    if (prediction) {
+      setExpense((prev) => ({
+        ...prev,
+        categoryId: prediction.categoryId, // set the predicted ID here
+      }));
+      setPrediction(null);
+    }
+  };
+
   const handleChange = async (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -109,38 +124,29 @@ const AddExpense: React.FC = () => {
     if (predictionTimeout) {
       clearTimeout(predictionTimeout);
     }
-    if (value.trim().length >= 3) {
+
+    if (name === "title" && value.trim().length >= 3) {
       const timeout = setTimeout(async () => {
         setLoadingCategory(true);
-
         try {
-          const res = await fetch(
-            "http://localhost:3000/api/predict-category",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ text: value }),
-            }
-          );
-
+          const res = await fetch(`${API_BASE}/predict-category`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: value }),
+          });
           const data = await res.json();
-          setPrediction(data?.categoryName);
+          setPrediction(data); // object
         } catch (err) {
           console.error(err);
-          setPrediction("Error");
         } finally {
           setLoadingCategory(false);
         }
       }, 800);
+
       setPredictionTimeout(timeout);
     } else if (value.trim().length === 0) {
       setPrediction(null);
     }
-    return () => {
-      if (predictionTimeout) {
-        clearTimeout(predictionTimeout);
-      }
-    };
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -262,12 +268,12 @@ const AddExpense: React.FC = () => {
                       <span className="text-sm text-gray-700">
                         AI suggests:
                         <div className="badge border-accent rounded-4xl text-[0.7rem] pt-0 bg-white font-semibold ml-2 text-black badge-outline">
-                          {prediction}
+                          {prediction.categoryName}
                         </div>
                       </span>
                     </div>
                     <button
-                      // onClick={onAccept}
+                      onClick={handleAcceptSuggestion}
                       className="btn btn-active bg-[#059669] text-white pt-0"
                     >
                       <Check className="w-4 h-4 mr-1 text-white" />

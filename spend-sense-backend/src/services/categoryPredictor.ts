@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import fetch from "node-fetch";
 
-type Category = { id: string; name: string };
+type Category = { _id: string; name: string };
 type Prediction = {
   categoryId: string;
   categoryName: string;
@@ -23,15 +23,25 @@ async function getCategories(): Promise<Category[]> {
 /** Predict category using Gemini */
 export async function categoryPredictor(text: string): Promise<Prediction> {
   const categories = await getCategories();
-  const categoryList = categories.map((c) => c.name).join(", ");
+  const categoryList = categories
+    .map((c) => `- ${c.name} (ID: ${c._id})`)
+    .join("\n");
 
   const prompt = `
 You are a financial assistant that classifies expense descriptions.
-Choose ONE category name from this list only:
+Choose ONE category from the list below.
+
+List of categories:
 ${categoryList}
 
-Return JSON ONLY like this:
-{"category":"<category name>","confidence":0.0-1.0}
+If the description does not fit any category, choose "Other".
+
+Return JSON ONLY in this exact format:
+{
+  "categoryId": "<use the ID from the list above>",
+  "categoryName": "<use the corresponding category name>",
+  "confidence": 0.0-1.0
+}
 
 Description: "${text}"
 `;
@@ -40,29 +50,34 @@ Description: "${text}"
 
   const result = await model.generateContent(prompt);
 
-  const raw = result.response.text();
-  console.log("Gemini raw:", raw);
+  let raw = result.response.text().trim();
+
+  // Remove markdown fences if present
+  raw = raw
+    .replace(/^```json\s*/, "")
+    .replace(/```$/, "")
+    .trim();
 
   try {
-    const parsed = JSON.parse(raw.trim());
-    const match = categories.find(
-      (c) => c.name.toLowerCase() === parsed.category.toLowerCase()
-    );
+    const parsed = JSON.parse(raw);
 
-    if (!match)
+    const match = categories.find((c) => c._id === parsed.categoryId);
+
+    if (!match) {
       return {
         categoryId: "uncategorized",
         categoryName: "Uncategorized",
         confidence: 0,
       };
+    }
 
     return {
-      categoryId: match.id,
+      categoryId: match._id,
       categoryName: match.name,
       confidence: parsed.confidence ?? 0.8,
     };
-  } catch {
-    // If Gemini output is not valid JSON, fallback
+  } catch (err) {
+    console.error("Failed to parse AI output:", raw);
     return {
       categoryId: "uncategorized",
       categoryName: "Uncategorized",
