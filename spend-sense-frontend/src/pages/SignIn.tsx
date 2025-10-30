@@ -64,14 +64,12 @@ export default function SignIn() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f4f3f8] px-4">
       <div className="w-full max-w-5xl bg-white rounded-3xl shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
-        <div className="relative hidden md:block bg-gradient-to-b from-[#efeafd] to-[#f6f5ff]">
-          <div className="absolute inset-0 flex items-center justify-center p-10">
-            <img
-              src="../src/images/budget684.png"
-              alt="Illustration"
-              className="absolute inset-0 w-full h-full object-contain p-10"
-            />
-          </div>
+        <div className="relative hidden md:block bg-gradient-to-b from-[#efeafd] to-[#f6f5ff] p-14">
+          <img
+            src="../src/images/budget684.png"
+            alt="Illustration"
+            className="w-full h-auto object-contain rounded-2xl"
+          />
         </div>
 
         <div className="p-8 md:p-10">
@@ -140,10 +138,6 @@ export default function SignIn() {
                 />
                 Remember me
               </label>
-
-              <Link to="#" className="text-sm text-purple-600 hover:underline">
-                Forgot password?
-              </Link>
             </div>
 
             {error && <p className="text-sm text-red-600">{error}</p>}
