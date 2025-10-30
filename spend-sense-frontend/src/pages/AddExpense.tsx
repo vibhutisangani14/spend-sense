@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Save, ArrowLeft } from "lucide-react";
+import { Save, ArrowLeft, Sparkles, Check } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface Category {
@@ -33,6 +33,12 @@ const AddExpense: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [prediction, setPrediction] = useState<string | null>(null);
+  const [loadingCategory, setLoadingCategory] = useState(false);
+  const [predictionTimeout, setPredictionTimeout] = useState<number | null>(
+    null
+  );
+
   const [expense, setExpense] = useState<Expense>({
     title: "",
     amount: "" as unknown as number,
@@ -92,13 +98,48 @@ const AddExpense: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleChange = (
+  const handleChange = async (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
     const { name, value } = e.target;
     setExpense((prev) => ({ ...prev, [name]: value }));
+    if (predictionTimeout) {
+      clearTimeout(predictionTimeout);
+    }
+    if (value.trim().length >= 3) {
+      const timeout = setTimeout(async () => {
+        setLoadingCategory(true);
+
+        try {
+          const res = await fetch(
+            "http://localhost:3000/api/predict-category",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ text: value }),
+            }
+          );
+
+          const data = await res.json();
+          setPrediction(data?.categoryName);
+        } catch (err) {
+          console.error(err);
+          setPrediction("Error");
+        } finally {
+          setLoadingCategory(false);
+        }
+      }, 800);
+      setPredictionTimeout(timeout);
+    } else if (value.trim().length === 0) {
+      setPrediction(null);
+    }
+    return () => {
+      if (predictionTimeout) {
+        clearTimeout(predictionTimeout);
+      }
+    };
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -174,6 +215,55 @@ const AddExpense: React.FC = () => {
                 required
                 className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-gray-950 text-sm focus:outline-none focus:ring-2 focus:ring-black"
               />
+              <p className="text-xs text-gray-500 mt-2">
+                💡 Type a description and AI will suggest the best category
+              </p>
+
+              {/* Show loading button below title while loading */}
+              {loadingCategory && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="flex items-center mt-4 gap-2 p-3 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-100">
+                    <div className="animate-spin">
+                      <Sparkles className="w-4 h-4 text-indigo-600" />
+                    </div>
+                    <span className="text-sm text-indigo-700 font-medium">
+                      Analyzing expense...
+                    </span>
+                  </div>
+                </motion.div>
+              )}
+              {prediction && !loadingCategory && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="flex items-center justify-between mt-4 p-3 bg-gradient-to-r from-emerald-50 to-cyan-50 rounded-lg border border-emerald-200">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-emerald-600" />
+                      <span className="text-sm text-gray-700">
+                        AI suggests:
+                        <div className="badge border-accent rounded-4xl text-[0.7rem] pt-0 bg-white font-semibold ml-2 text-black badge-outline">
+                          {prediction}
+                        </div>
+                      </span>
+                    </div>
+                    <button
+                      // onClick={onAccept}
+                      className="btn btn-active bg-[#059669] text-white pt-0"
+                    >
+                      <Check className="w-4 h-4 mr-1 text-white" />
+                      Accept
+                    </button>
+                  </div>
+                </motion.div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

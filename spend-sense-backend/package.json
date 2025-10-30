@@ -34,6 +34,10 @@
     "#middleware": {
       "development": "./src/middleware/index.ts",
       "default": "./dist/middleware/index.js"
+    },
+    "#services": {
+      "development": "./src/services/index.ts",
+      "default": "./dist/services/index.js"
     }
   },
   "keywords": [],
@@ -51,6 +55,7 @@
     "typescript": "5.4"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "bcryptjs": "^3.0.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -58,6 +63,7 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.1",
+    "node-fetch": "^3.3.2",
     "zod": "^4.1.12"
   }
 }
