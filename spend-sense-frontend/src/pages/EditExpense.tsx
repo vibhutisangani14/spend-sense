@@ -33,6 +33,7 @@ const EditExpense: React.FC = () => {
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [receipt, setReceipt] = useState<string | null>(null);
 
   const [expense, setExpense] = useState<Expense>({
     title: "",
@@ -115,6 +116,7 @@ const EditExpense: React.FC = () => {
         paymentMethodId: expense.paymentMethodId,
         notes: expense.notes || "",
         userId,
+        receipt,
       };
       console.log("Sending payload:", payload);
 
@@ -134,6 +136,17 @@ const EditExpense: React.FC = () => {
     } catch (err: any) {
       console.error("❌ Error updating expense:", err.response?.data || err);
     }
+  };
+
+  const handleReceiptUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setReceipt(reader.result as string);
+    };
+    reader.readAsDataURL(file);
   };
 
   if (loading) return <div className="p-6">Loading...</div>;
@@ -272,6 +285,48 @@ const EditExpense: React.FC = () => {
                 value={expense.notes}
                 onChange={handleChange}
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Receipt (Optional)
+              </label>
+
+              <label
+                htmlFor="receipt-upload"
+                className="flex items-center justify-center gap-2 border border-gray-200 rounded-lg px-4 py-3 bg-[#f9f9fa] text-sm text-gray-700 cursor-pointer hover:border-indigo-500 hover:text-indigo-600 transition-all"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12V4m0 0L8 8m4-4l4 4"
+                  />
+                </svg>
+                <span className="font-medium">
+                  {receipt ? "Receipt Selected" : "Upload Receipt"}
+                </span>
+                <input
+                  id="receipt-upload"
+                  type="file"
+                  accept="image/*,application/pdf"
+                  onChange={handleReceiptUpload}
+                  className="hidden"
+                />
+              </label>
+
+              {receipt && (
+                <p className="mt-2 text-xs text-gray-500 truncate">
+                  {receipt.substring(0, 40)}...
+                </p>
+              )}
             </div>
 
             {/* Action buttons */}

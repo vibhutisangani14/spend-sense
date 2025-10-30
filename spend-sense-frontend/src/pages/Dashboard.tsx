@@ -1,10 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import SummaryCard from "../components/SummaryCard";
 import ExpenseItem from "../components/ExpenseItem";
 import {
-  Plus,
-  RefreshCw,
   DollarSign,
   TrendingUp,
   CreditCard,
@@ -192,22 +190,6 @@ const Dashboard: React.FC = () => {
             Track and manage your spending
             {`. ${expenses.length} expenses loaded`}
           </p>
-        </div>
-        <div>
-          <Link
-            to=""
-            className="btn bg-white text-black px-5 py-2 rounded-lg mr-3"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Refresh
-          </Link>
-          <Link
-            to="/app/addExpense"
-            className="btn bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] text-white shadow-xl px-5 py-2 rounded-lg"
-          >
-            <Plus className="w-4 h-4" />
-            Add Expense
-          </Link>
         </div>
       </div>
 
