@@ -4,13 +4,12 @@ import SummaryCard from "../components/SummaryCard";
 import ExpenseItem from "../components/ExpenseItem";
 import { motion } from "framer-motion";
 import {
-  Plus,
-  RefreshCw,
   DollarSign,
   TrendingUp,
   CreditCard,
   Calendar,
   Funnel,
+  Plus,
 } from "lucide-react";
 import {
   PieChart,
@@ -81,7 +80,7 @@ const Dashboard: React.FC = () => {
           title: e.title,
           amount: e.amount,
           category: e.categoryId?.name || e.category || "Other",
-          method: e.paymentMethodId?.name || e.paymentMethodId || "Unknown",
+          method: e.method || "Unknown",
           date: e.date,
           note: e.notes || "",
         }));
@@ -200,13 +199,6 @@ const Dashboard: React.FC = () => {
           </div>
 
           <div className="flex justify-end gap-3 w-full md:w-auto">
-            <Link
-              to=""
-              className="btn bg-white text-black px-5 py-2 rounded-lg flex items-center gap-2"
-            >
-              <RefreshCw className="w-4 h-4" />
-              Refresh
-            </Link>
             <Link
               to="/app/addExpense"
               className="btn border-none bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] text-white shadow-lg shadow-indigo-500/30 px-5 py-2 rounded-lg flex items-center gap-2"
@@ -366,12 +358,7 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
       {filteredExpenses.length > 0 ? (
-        filteredExpenses.map((e) => (
-          <ExpenseItem
-            key={e._id}
-            e={{ ...e, method: e.method ?? "Unknown" }}
-          />
-        ))
+        filteredExpenses.map((e) => <ExpenseItem key={e._id} e={e} />)
       ) : (
         <div className="text-slate-400 text-sm">
           No expenses match this filter.

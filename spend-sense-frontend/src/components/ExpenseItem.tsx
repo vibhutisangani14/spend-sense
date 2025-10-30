@@ -41,7 +41,6 @@ const categoryIcons: Record<string, React.ReactNode> = {
 };
 
 const ExpenseItem: React.FC<APIExpense> = ({ e }) => {
-  console.log(e);
   const navigate = useNavigate();
   const Icon = categoryIcons[e.category] || <FcEmptyFilter />;
 
