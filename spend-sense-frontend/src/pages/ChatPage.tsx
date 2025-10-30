@@ -76,7 +76,6 @@ const ChatPage: React.FC = () => {
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-white flex justify-center px-6">
       <div className="w-full max-w-5xl bg-white rounded-3xl shadow-[0_0_45px_rgba(0,0,0,0.07)] border border-gray-100 flex flex-col p-10 mt-0">
-        {/* Header */}
         <div className="flex items-center gap-3 mb-6 sticky top-0 bg-white z-10 pb-2">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-md">
             <Bot className="w-6 h-6" />
@@ -91,7 +90,6 @@ const ChatPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Chat area */}
         <div className="flex-1 overflow-y-auto rounded-2xl bg-white p-6 space-y-6 shadow-inner border border-gray-100 transition-all duration-500">
           {!hasStartedChat && (
             <div className="flex items-start gap-4">
@@ -107,7 +105,6 @@ const ChatPage: React.FC = () => {
             </div>
           )}
 
-          {/* Messages */}
           {chat.map((msg, i) => (
             <div
               key={i}
@@ -146,7 +143,6 @@ const ChatPage: React.FC = () => {
             </div>
           ))}
 
-          {/* Thinking */}
           {isThinking && (
             <div className="flex items-center gap-3 text-gray-500 ml-12">
               <Loader2 className="animate-spin w-4 h-4" />
@@ -154,7 +150,6 @@ const ChatPage: React.FC = () => {
             </div>
           )}
 
-          {/* Suggestions */}
           {!hasStartedChat && (
             <div className="ml-14 space-y-3 fade-in">
               <p className="text-gray-600 font-medium">Try asking:</p>
@@ -181,7 +176,6 @@ const ChatPage: React.FC = () => {
           )}
         </div>
 
-        {/* Input */}
         <form
           onSubmit={handleSend}
           className="mt-5 flex items-center gap-3 border border-gray-200 rounded-full px-5 py-2.5 shadow-sm bg-white sticky bottom-4"

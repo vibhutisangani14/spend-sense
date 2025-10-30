@@ -71,7 +71,7 @@ const Dashboard: React.FC = () => {
         const [exp, cats, methods] = await Promise.all([
           fetchExpenses(),
           fetchCategories(),
-          fetch("http://localhost:3000/api/paymentMethods").then((res) =>
+          fetch(`${import.meta.env.VITE_API_URL}/paymentMethods`).then((res) =>
             res.json()
           ),
         ]);
@@ -163,7 +163,6 @@ const Dashboard: React.FC = () => {
     }));
   }, [filteredExpenses]);
 
-  // Calculate total for current month
   const now = new Date();
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
