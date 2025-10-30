@@ -10,6 +10,7 @@ import {
   userRouter,
   expenseRouter,
   paymentMethodRouter,
+  predictRouter,
 } from "#routers";
 import authRoutes from "./routes/authRoutes";
 
@@ -27,6 +28,7 @@ app.use(
 );
 app.use(express.json(), cookieParser());
 // Routes
+app.use("/api", predictRouter);
 app.use("/api/auth", authRoutes);
 app.use("/api/categories", categoryRouter);
 app.use("/api/users", userRouter);

@@ -22,6 +22,7 @@ const expenseInputSchema = z.strictObject({
     .string()
     .refine((val) => isValidObjectId(val), "Invalid Payment method ID")
     .optional(),
+  receipt: z.string().optional(),
   notes: z.string().optional(),
   userId: z.string().refine((val) => isValidObjectId(val), "Invalid User ID"),
 });

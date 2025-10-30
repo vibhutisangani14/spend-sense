@@ -32,6 +32,11 @@ const expenseSchema = new Schema(
       ref: "paymentMethod",
       required: false,
     },
+    receipt: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     notes: {
       type: String,
       default: "",

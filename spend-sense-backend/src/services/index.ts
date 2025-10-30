@@ -1,0 +1,1 @@
+export { categoryPredictor } from "./categoryPredictor";
