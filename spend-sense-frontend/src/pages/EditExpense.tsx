@@ -23,7 +23,7 @@ interface Expense {
   paymentMethodId: string;
   notes?: string;
   userId: string;
-  receipt?: File | null;
+  receipt?: string;
 }
 
 const EditExpense: React.FC = () => {
@@ -42,7 +42,7 @@ const EditExpense: React.FC = () => {
     paymentMethodId: "",
     notes: "",
     userId: "",
-    receipt: null,
+    receipt: "",
   });
   const [userId, setUserId] = useState<string>("");
 
@@ -71,9 +71,10 @@ const EditExpense: React.FC = () => {
           paymentMethodId: expenseData.paymentMethodId?._id || "",
           notes: expenseData.notes || "",
           userId: expenseData.userId,
-          receipt: null,
+          receipt: expenseData.receipt || null,
         });
 
+        setReceipt(expenseData.receipt || null);
         setUserId(expenseData.userId?._id || "");
         setCategories(categoryRes.data);
         setPaymentMethods(paymentRes.data);
@@ -107,7 +108,7 @@ const EditExpense: React.FC = () => {
         paymentMethodId: expense.paymentMethodId,
         notes: expense.notes || "",
         userId,
-        receipt,
+        receipt: receipt || "",
       };
 
       const response = await axios.put(

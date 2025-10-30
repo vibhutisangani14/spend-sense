@@ -7,6 +7,7 @@ export interface ExpenseResponse {
   paymentMethodId?: { name: string };
   date: string;
   notes?: string;
+  receipt?: string;
 }
 
 export interface Category {
@@ -46,6 +47,7 @@ export const fetchExpenses = async () => {
       method: e.paymentMethodId?.name || "Unknown",
       date: e.date,
       note: e.notes || "",
+      receipt: e.receipt || "",
     }));
   } catch (err) {
     console.error("❌ Error fetching expenses:", err);
