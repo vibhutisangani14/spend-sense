@@ -28,17 +28,14 @@ interface User {
   name: string;
   email: string;
 }
-interface PredictedCategory {
-  categoryId: string;
-  categoryName: string;
-}
+
 const AddExpense: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [receipt, setReceipt] = useState<File | null>(null);
-  const [prediction, setPrediction] = useState<PredictedCategory | null>(null);
+  const [prediction, setPrediction] = useState<string | null>(null);
   const [loadingCategory, setLoadingCategory] = useState(false);
   const [predictionTimeout, setPredictionTimeout] = useState<number | null>(
     null
@@ -54,7 +51,6 @@ const AddExpense: React.FC = () => {
     userId: "",
   });
   const [user, setUser] = useState<User | null>(null);
-  const API_BASE = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const storedUser = localStorage.getItem("spendsense_user");
@@ -65,6 +61,7 @@ const AddExpense: React.FC = () => {
         console.error("Failed to parse user from localStorage", error);
       }
     }
+
     const fetchData = async () => {
       try {
         const [categoryRes, paymentRes] = await Promise.all([
@@ -104,16 +101,6 @@ const AddExpense: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleAcceptSuggestion = () => {
-    if (prediction) {
-      setExpense((prev) => ({
-        ...prev,
-        categoryId: prediction.categoryId, // set the predicted ID here
-      }));
-      setPrediction(null);
-    }
-  };
-
   const handleChange = async (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -121,6 +108,8 @@ const AddExpense: React.FC = () => {
   ) => {
     const { name, value } = e.target;
     setExpense((prev) => ({ ...prev, [name]: value }));
+
+    // AI Prediction Logic
     if (predictionTimeout) {
       clearTimeout(predictionTimeout);
     }
@@ -129,23 +118,53 @@ const AddExpense: React.FC = () => {
       const timeout = setTimeout(async () => {
         setLoadingCategory(true);
         try {
-          const res = await fetch(`${API_BASE}/predict-category`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: value }),
-          });
+          const res = await fetch(
+            "http://localhost:3000/api/predict-category",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ text: value }),
+            }
+          );
           const data = await res.json();
-          setPrediction(data); // object
+          setPrediction(data?.categoryName);
         } catch (err) {
           console.error(err);
+          setPrediction("Error");
         } finally {
           setLoadingCategory(false);
         }
       }, 800);
-
       setPredictionTimeout(timeout);
     } else if (value.trim().length === 0) {
       setPrediction(null);
+    }
+  };
+
+  // 🟣 Add Custom Category Option
+  const handleCategoryChange = async (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const value = e.target.value;
+    if (value === "custom") {
+      const newCategoryName = prompt("Enter a new category name:");
+      if (newCategoryName && newCategoryName.trim().length > 0) {
+        try {
+          const res = await axios.post(
+            `${import.meta.env.VITE_API_URL}/categories`,
+            { name: newCategoryName },
+            { withCredentials: true }
+          );
+          // Add new category to list
+          setCategories((prev) => [...prev, res.data]);
+          setExpense((prev) => ({ ...prev, categoryId: res.data._id }));
+        } catch (err) {
+          console.error("Error creating custom category:", err);
+          alert("Failed to create category. Please try again.");
+        }
+      }
+    } else {
+      setExpense((prev) => ({ ...prev, categoryId: value }));
     }
   };
 
@@ -174,6 +193,7 @@ const AddExpense: React.FC = () => {
       console.error("❌ Error adding expense:", err.response?.data || err);
     }
   };
+
   const handleReceiptUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -188,7 +208,7 @@ const AddExpense: React.FC = () => {
   if (loading) return <div className="p-6">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-white py-9 px-6 flex flex-col mx-18 justify-center">
+    <div className="min-h-screen bg-white py-9 px-6 flex flex-col sm:mx-18 justify-center">
       <div className="flex flex-col items-start justify-between">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -204,12 +224,13 @@ const AddExpense: React.FC = () => {
             Back to Dashboard
           </button>
 
-          <h1 className="text-4xl font-bold  bg-[linear-gradient(135deg,#5344e5,#7c4bed,#9035ea)] bg-clip-text text-transparent my-2">
+          <h1 className="text-4xl font-bold bg-[linear-gradient(135deg,#5344e5,#7c4bed,#9035ea)] bg-clip-text text-transparent my-2">
             Add Expense
           </h1>
           <p className="text-gray-600">Record your spending details</p>
         </motion.div>
       </div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -222,6 +243,7 @@ const AddExpense: React.FC = () => {
           <div className="border border-gray-100"></div>
 
           <form onSubmit={handleSubmit} className="space-y-6 p-6">
+            {/* TITLE */}
             <div>
               <label className="block text-sm font-medium mb-2">Title *</label>
               <input
@@ -237,15 +259,14 @@ const AddExpense: React.FC = () => {
                 💡 Type a description and AI will suggest the best category
               </p>
 
-              {/* Show loading button below title while loading */}
+              {/* AI Suggestion */}
               {loadingCategory && (
                 <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="overflow-hidden"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="mt-4"
                 >
-                  <div className="flex items-center mt-4 gap-2 p-3 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-100">
+                  <div className="flex items-center gap-2 p-3 bg-indigo-50 rounded-lg border border-indigo-100">
                     <div className="animate-spin">
                       <Sparkles className="w-4 h-4 text-indigo-600" />
                     </div>
@@ -255,35 +276,35 @@ const AddExpense: React.FC = () => {
                   </div>
                 </motion.div>
               )}
+
               {prediction && !loadingCategory && (
                 <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="overflow-hidden"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="mt-4"
                 >
-                  <div className="flex items-center justify-between mt-4 p-3 bg-gradient-to-r from-emerald-50 to-cyan-50 rounded-lg border border-emerald-200">
+                  <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-lg border border-emerald-200">
                     <div className="flex items-center gap-2">
                       <Sparkles className="w-4 h-4 text-emerald-600" />
                       <span className="text-sm text-gray-700">
-                        AI suggests:
-                        <div className="badge border-accent rounded-4xl text-[0.7rem] pt-0 bg-white font-semibold ml-2 text-black badge-outline">
-                          {prediction.categoryName}
-                        </div>
+                        AI suggests:{" "}
+                        <span className="font-semibold text-black ml-1">
+                          {prediction}
+                        </span>
                       </span>
                     </div>
                     <button
-                      onClick={handleAcceptSuggestion}
-                      className="btn btn-active bg-[#059669] text-white pt-0"
+                      type="button"
+                      className="btn bg-green-600 text-white px-3 py-1 rounded-lg text-sm flex items-center gap-1"
                     >
-                      <Check className="w-4 h-4 mr-1 text-white" />
-                      Accept
+                      <Check className="w-4 h-4" /> Accept
                     </button>
                   </div>
                 </motion.div>
               )}
             </div>
 
+            {/* AMOUNT & CATEGORY */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium mb-2">
@@ -300,6 +321,7 @@ const AddExpense: React.FC = () => {
                   className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-gray-950 text-sm focus:outline-none focus:ring-2 focus:ring-black"
                 />
               </div>
+
               <div>
                 <label className="block text-sm font-medium mb-2">
                   Category *
@@ -307,7 +329,7 @@ const AddExpense: React.FC = () => {
                 <select
                   name="categoryId"
                   value={expense.categoryId}
-                  onChange={handleChange}
+                  onChange={handleCategoryChange}
                   required
                   className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-gray-950 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
                 >
@@ -316,10 +338,12 @@ const AddExpense: React.FC = () => {
                       {cat.name}
                     </option>
                   ))}
+                  <option value="custom">➕ Add Custom Category</option>
                 </select>
               </div>
             </div>
 
+            {/* DATE & PAYMENT */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium mb-2">Date *</label>
@@ -332,6 +356,7 @@ const AddExpense: React.FC = () => {
                   className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-gray-950 text-sm focus:outline-none focus:ring-2 focus:ring-black"
                 />
               </div>
+
               <div>
                 <label className="block text-sm font-medium mb-2">
                   Payment Method
@@ -351,6 +376,7 @@ const AddExpense: React.FC = () => {
               </div>
             </div>
 
+            {/* NOTES */}
             <div>
               <label className="block text-sm font-medium mb-2">Notes</label>
               <textarea
@@ -363,32 +389,16 @@ const AddExpense: React.FC = () => {
               />
             </div>
 
+            {/* RECEIPT */}
             <div>
               <label className="block text-sm font-medium mb-2">
                 Receipt (Optional)
               </label>
-
               <label
                 htmlFor="receipt-upload"
                 className="flex items-center justify-center gap-2 border border-gray-200 rounded-lg px-4 py-3 bg-[#f9f9fa] text-sm text-gray-700 cursor-pointer hover:border-indigo-500 hover:text-indigo-600 transition-all"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-5 h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12V4m0 0L8 8m4-4l4 4"
-                  />
-                </svg>
-                <span className="font-medium">
-                  {receipt ? "Receipt Selected" : "Upload Receipt"}
-                </span>
+                <span>{receipt ? "Receipt Selected" : "Upload Receipt"}</span>
                 <input
                   id="receipt-upload"
                   type="file"
@@ -397,14 +407,9 @@ const AddExpense: React.FC = () => {
                   className="hidden"
                 />
               </label>
-
-              {receipt && (
-                <p className="mt-2 text-xs text-gray-500 truncate">
-                  {receipt.substring(0, 40)}...
-                </p>
-              )}
             </div>
 
+            {/* BUTTONS */}
             <div className="flex flex-row gap-2">
               <button
                 type="button"
