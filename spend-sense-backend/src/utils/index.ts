@@ -19,7 +19,7 @@ const createTokens = async (userData: UserData): Promise<[string, string]> => {
   const payload = { roles: userData.roles };
   const secret = process.env.JWT_SECRET!;
   const tokenOptions = {
-    expiresIn: 15 * 60,
+    expiresIn: 60 * 60,
     subject: userData._id.toString(),
   };
 
