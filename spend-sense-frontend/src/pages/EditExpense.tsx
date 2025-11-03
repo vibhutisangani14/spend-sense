@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Save, ArrowLeft } from "lucide-react";
+import { Save, ArrowLeft, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface Category {
@@ -33,6 +33,7 @@ const EditExpense: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [receipt, setReceipt] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const [expense, setExpense] = useState<Expense>({
     title: "",
@@ -138,6 +139,21 @@ const EditExpense: React.FC = () => {
     reader.readAsDataURL(file);
   };
 
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/expenses/${id}`, {
+        withCredentials: true,
+      });
+      console.log("🗑️ Expense deleted successfully");
+      navigate("/app");
+    } catch (err: any) {
+      console.error("❌ Error deleting expense:", err.response?.data || err);
+      alert("Failed to delete expense. Please try again.");
+    } finally {
+      setShowDeleteModal(false);
+    }
+  };
+
   if (loading) return <div className="p-6">Loading...</div>;
   if (!expense) return <div className="p-6">Expense not found</div>;
 
@@ -174,7 +190,6 @@ const EditExpense: React.FC = () => {
             Expense Details
           </h2>
           <div className="border border-gray-100"></div>
-
           <form onSubmit={handleSubmit} className="space-y-6 p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -315,23 +330,60 @@ const EditExpense: React.FC = () => {
             </div>
 
             {/* Action buttons */}
-            <div className="flex flex-row gap-2">
+            <div className="flex flex-row gap-4">
               <button
                 type="button"
-                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-sm text-black font-semibold hover:bg-indigo-700 hover:text-white transition"
+                onClick={() => setShowDeleteModal(true)}
+                className="w-32 border border-red-400 text-red-500 rounded-lg px-4 py-2.5 flex items-center justify-center gap-2  bg-[#f9f9fa] text-sm text-black font-semibold hover:bg-[#fff0f0] hover:text-black transition"
+              >
+                <Trash2 className="w-4 h-4" />
+                Delete
+              </button>
+              <button
+                type="button"
+                className="w-96 border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-sm text-black font-semibold hover:bg-indigo-700 hover:text-white transition"
                 onClick={() => navigate("/app")}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="w-full bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] flex items-center justify-center gap-2 text-sm text-white font-semibold py-2.5 rounded-lg hover:opacity-90 transition"
+                className="w-96 bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] flex items-center justify-center gap-2 text-sm text-white font-semibold py-2.5 rounded-lg hover:opacity-90 transition"
               >
                 <Save className="w-4 h-4" />
                 Save Expense
               </button>
             </div>
           </form>
+
+          {/* Delete Confirmation Modal */}
+          {showDeleteModal && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black/85  z-50">
+              <div className="bg-white rounded-2xl shadow-xl p-6 w-[90%] max-w-lg animate-fadeIn">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Delete Expense?
+                </h3>
+                <p className="text-sm text-gray-500 mb-6">
+                  This action cannot be undone. This will permanently delete
+                  this expense.
+                </p>
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={() => setShowDeleteModal(false)}
+                    className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium hover:bg-gray-100"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    className="px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </motion.div>
     </div>

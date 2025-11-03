@@ -211,7 +211,7 @@ const Dashboard: React.FC = () => {
         </motion.div>
       </div>
       <div className="col-span-12 lg:col-span-8">
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2  lg:grid-cols-4 gap-6">
           <SummaryCard
             title="Total Expenses"
             value={`€${total.toFixed(2)}`}
@@ -242,7 +242,7 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-12 gap-6 mt-3 lg:col-span-12">
+      <div className="grid grid-cols-12 gap-6 mt-3 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-12 lg:col-span-12">
         <div className="p-6 bg-white rounded-xl shadow-xl shadow-gray-400/30  h-full lg:col-span-6">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
