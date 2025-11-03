@@ -25,7 +25,7 @@ const MainLayout: React.FC = () => {
       <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
       {/* Main content */}
-      <main className="flex-1 bg-[url('')] min-h-screen px-4 sm:px-8 py-6 transition-all duration-300 mt-16 sm:mt-0 sm:ml-64">
+      <main className="flex-1 bg-[url('')] min-h-screen transition-all duration-300 mt-16 sm:mt-0 sm:ml-64">
         <Outlet />
       </main>
 

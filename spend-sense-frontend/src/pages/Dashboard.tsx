@@ -210,8 +210,8 @@ const Dashboard: React.FC = () => {
           </div>
         </motion.div>
       </div>
-      <div className="col-span-12 lg:col-span-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2  lg:grid-cols-4 gap-6">
+      <div className="col-span-12 lg:col-span-8 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
           <SummaryCard
             title="Total Expenses"
             value={`€${total.toFixed(2)}`}
