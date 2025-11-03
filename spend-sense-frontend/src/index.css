@@ -28,8 +28,23 @@ body {
 
 .pulse-badge {
   background: linear-gradient(90deg, #f0efff, #fff0fb);
+  opacity: 0.8;
 }
 
 .expense-item {
   border-radius: 12px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
 }

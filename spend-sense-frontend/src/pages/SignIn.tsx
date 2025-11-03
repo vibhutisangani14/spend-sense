@@ -64,18 +64,14 @@ export default function SignIn() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f4f3f8] px-4">
       <div className="w-full max-w-5xl bg-white rounded-3xl shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
-        {/* Left visual panel */}
-        <div className="relative hidden md:block bg-gradient-to-b from-[#efeafd] to-[#f6f5ff]">
-          <div className="absolute inset-0 flex items-center justify-center p-10">
-            <img
-              src="../src/images/budget684.png"
-              alt="Illustration"
-              className="absolute inset-0 w-full h-full object-contain p-10"
-            />
-          </div>
+        <div className="relative hidden md:block bg-gradient-to-b from-[#efeafd] to-[#f6f5ff] p-14">
+          <img
+            src="../src/images/budget684.png"
+            alt="Illustration"
+            className="w-full h-auto object-contain rounded-2xl"
+          />
         </div>
 
-        {/* Right form panel */}
         <div className="p-8 md:p-10">
           <div className="flex items-center justify-end mb-6">
             <div className="text-sm text-gray-500">
@@ -92,7 +88,6 @@ export default function SignIn() {
           </p>
 
           <form onSubmit={onSubmit} className="space-y-5">
-            {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Email
@@ -107,7 +102,6 @@ export default function SignIn() {
               />
             </div>
 
-            {/* Password */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Password
@@ -134,7 +128,6 @@ export default function SignIn() {
               </div>
             </div>
 
-            {/* Remember me */}
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 text-sm text-gray-600">
                 <input
@@ -145,16 +138,10 @@ export default function SignIn() {
                 />
                 Remember me
               </label>
-
-              <Link to="#" className="text-sm text-purple-600 hover:underline">
-                Forgot password?
-              </Link>
             </div>
 
-            {/* Error */}
             {error && <p className="text-sm text-red-600">{error}</p>}
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
