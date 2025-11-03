@@ -18,11 +18,12 @@ const SummaryCard: React.FC<SummaryCardProps> = ({
 }) => {
   return (
     <motion.div
+      className="h-full"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 1 * 0.1 }}
     >
-      <div className="p-4 sm:p-6 bg-white rounded-xl shadow-lg shadow-gray-400/30 relative overflow-hidden">
+      <div className="p-4 sm:p-6 bg-white rounded-xl shadow-lg shadow-gray-400/30 relative overflow-hidden h-full flex flex-col justify-between">
         <div
           className={`absolute top-0 right-0 w-16 h-16 sm:w-20 sm:h-20 ${color} rounded-bl-full`}
         ></div>
