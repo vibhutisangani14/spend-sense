@@ -4,13 +4,13 @@ import {
   login,
   logout,
   refresh,
-} from "../controllers/authController";
+} from "../controllers/authController.js";
 
-const router = Router();
+const authRoutes = Router();
 
-router.post("/register", register);
-router.post("/login", login);
-router.delete("/logout", logout);
-router.delete("/refresh", refresh);
+authRoutes.post("/register", register);
+authRoutes.post("/login", login);
+authRoutes.delete("/logout", logout);
+authRoutes.delete("/refresh", refresh);
 
-export default router;
+export default authRoutes;

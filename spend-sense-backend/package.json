@@ -2,13 +2,14 @@
   "name": "spend-sense-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/server.js",
+  "type": "module",
+  "main": "dist/app.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/server.ts",
+    "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/app.ts",
     "prebuild": "rm -rf dist",
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc",
     "prestart": "npm run build",
-    "start": "node -r tsconfig-paths/register dist/server.js"
+    "start": "node -r tsconfig-paths/register dist/app.js"
   },
   "imports": {
     "#db": {
@@ -38,6 +39,14 @@
     "#services": {
       "development": "./src/services/index.ts",
       "default": "./dist/services/index.js"
+    },
+    "#routes": {
+      "development": "./src/routes/index.ts",
+      "default": "./dist/routes/index.js"
+    },
+    "#utils": {
+      "development": "./src/utils/index.ts",
+      "default": "./dist/utils/index.js"
     }
   },
   "keywords": [],

@@ -2,9 +2,9 @@ import "#db";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { errorHandler } from "#middleware";
 import cookieParser from "cookie-parser";
-import { router } from "services";
+import { errorHandler } from "#middleware";
+import { router } from "./services/index.js";
 
 import {
   categoryRouter,
@@ -13,7 +13,7 @@ import {
   paymentMethodRouter,
   predictRouter,
 } from "#routers";
-import authRoutes from "./routes/authRoutes";
+import authRoutes from "#routes";
 
 dotenv.config();
 

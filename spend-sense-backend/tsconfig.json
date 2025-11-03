@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "CommonJS",
+    "module": "ESNext", // instead of "CommonJS"
     "moduleResolution": "Node",
     "rootDir": "./src",
     "outDir": "./dist",
@@ -26,7 +26,11 @@
       "#middleware": ["middleware/index.ts"],
       "#middleware/*": ["middleware/*"],
       "#services": ["services/index.ts"],
-      "#services/*": ["services/*"]
+      "#services/*": ["services/*"],
+      "#utils": ["utils/index.ts"],
+      "#utils/*": ["utils/*"],
+      "#routes": ["routes/index.ts"],
+      "#routes/*": ["routes/*"]
     }
   },
   "include": ["src/**/*.ts"],

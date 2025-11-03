@@ -1,5 +1,5 @@
 import { z } from "zod/v4";
-import { dbEntrySchema } from "./shared";
+import { dbEntrySchema } from "./shared.js";
 
 const predictedcategoryInputSchema = z.strictObject({
   text: z.string().min(1, "text is required"),

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import User from "../models/User";
-import { generateToken } from "../utils/generateToken";
-import { createTokens, setAuthCookies } from "utils";
+import User from "../models/User.js";
+import { generateToken } from "../utils/generateToken.js";
+import { createTokens, setAuthCookies } from "#utils";
 import { RefreshToken } from "#models";
 
 export async function register(req: Request, res: Response) {

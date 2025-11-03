@@ -8,7 +8,7 @@ if (!secret) {
   process.exit(1);
 }
 
-const authenticate: RequestHandler = (req, _res, next) => {
+export const authenticate: RequestHandler = (req, _res, next) => {
   const { accessToken } = req.cookies;
 
   if (!accessToken)
@@ -41,5 +41,3 @@ const authenticate: RequestHandler = (req, _res, next) => {
     }
   }
 };
-
-export default authenticate;
