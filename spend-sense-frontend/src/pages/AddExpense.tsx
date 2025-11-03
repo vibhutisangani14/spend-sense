@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Save, ArrowLeft, Sparkles, Check } from "lucide-react";
@@ -31,6 +31,7 @@ interface User {
 
 const AddExpense: React.FC = () => {
   const navigate = useNavigate();
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
@@ -51,6 +52,10 @@ const AddExpense: React.FC = () => {
     userId: "",
   });
   const [user, setUser] = useState<User | null>(null);
+
+  // Custom category states
+  const [showAddInput, setShowAddInput] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
 
   useEffect(() => {
     const storedUser = localStorage.getItem("spendsense_user");
@@ -101,6 +106,20 @@ const AddExpense: React.FC = () => {
     fetchData();
   }, []);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowAddInput(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const handleChange = async (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -109,10 +128,7 @@ const AddExpense: React.FC = () => {
     const { name, value } = e.target;
     setExpense((prev) => ({ ...prev, [name]: value }));
 
-    // AI Prediction Logic
-    if (predictionTimeout) {
-      clearTimeout(predictionTimeout);
-    }
+    if (predictionTimeout) clearTimeout(predictionTimeout);
 
     if (name === "title" && value.trim().length >= 3) {
       const timeout = setTimeout(async () => {
@@ -141,30 +157,21 @@ const AddExpense: React.FC = () => {
     }
   };
 
-  // 🟣 Add Custom Category Option
-  const handleCategoryChange = async (
-    e: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const value = e.target.value;
-    if (value === "custom") {
-      const newCategoryName = prompt("Enter a new category name:");
-      if (newCategoryName && newCategoryName.trim().length > 0) {
-        try {
-          const res = await axios.post(
-            `${import.meta.env.VITE_API_URL}/categories`,
-            { name: newCategoryName },
-            { withCredentials: true }
-          );
-          // Add new category to list
-          setCategories((prev) => [...prev, res.data]);
-          setExpense((prev) => ({ ...prev, categoryId: res.data._id }));
-        } catch (err) {
-          console.error("Error creating custom category:", err);
-          alert("Failed to create category. Please try again.");
-        }
-      }
-    } else {
-      setExpense((prev) => ({ ...prev, categoryId: value }));
+  const handleAddCategory = async () => {
+    if (!newCategory.trim()) return;
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/categories`,
+        { name: newCategory },
+        { withCredentials: true }
+      );
+      setCategories((prev) => [...prev, res.data]);
+      setExpense((prev) => ({ ...prev, categoryId: res.data._id }));
+      setNewCategory("");
+      setShowAddInput(false);
+    } catch (err) {
+      console.error("Error adding new category:", err);
+      alert("Failed to add category");
     }
   };
 
@@ -178,16 +185,11 @@ const AddExpense: React.FC = () => {
         receipt: receipt || "",
       };
 
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/expenses`,
-        payload,
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
-      );
+      await axios.post(`${import.meta.env.VITE_API_URL}/expenses`, payload, {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
+      });
 
-      console.log("✅ Expense added:", response.data);
       navigate("/app");
     } catch (err: any) {
       console.error("❌ Error adding expense:", err.response?.data || err);
@@ -199,9 +201,7 @@ const AddExpense: React.FC = () => {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onloadend = () => {
-      setReceipt(reader.result as string);
-    };
+    reader.onloadend = () => setReceipt(reader.result as string);
     reader.readAsDataURL(file);
   };
 
@@ -255,53 +255,6 @@ const AddExpense: React.FC = () => {
                 required
                 className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-gray-950 text-sm focus:outline-none focus:ring-2 focus:ring-black"
               />
-              <p className="text-xs text-gray-500 mt-2">
-                💡 Type a description and AI will suggest the best category
-              </p>
-
-              {/* AI Suggestion */}
-              {loadingCategory && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="mt-4"
-                >
-                  <div className="flex items-center gap-2 p-3 bg-indigo-50 rounded-lg border border-indigo-100">
-                    <div className="animate-spin">
-                      <Sparkles className="w-4 h-4 text-indigo-600" />
-                    </div>
-                    <span className="text-sm text-indigo-700 font-medium">
-                      Analyzing expense...
-                    </span>
-                  </div>
-                </motion.div>
-              )}
-
-              {prediction && !loadingCategory && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="mt-4"
-                >
-                  <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-lg border border-emerald-200">
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-emerald-600" />
-                      <span className="text-sm text-gray-700">
-                        AI suggests:{" "}
-                        <span className="font-semibold text-black ml-1">
-                          {prediction}
-                        </span>
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      className="btn bg-green-600 text-white px-3 py-1 rounded-lg text-sm flex items-center gap-1"
-                    >
-                      <Check className="w-4 h-4" /> Accept
-                    </button>
-                  </div>
-                </motion.div>
-              )}
             </div>
 
             {/* AMOUNT & CATEGORY */}
@@ -322,24 +275,76 @@ const AddExpense: React.FC = () => {
                 />
               </div>
 
-              <div>
+              {/* CATEGORY WITH INLINE ADD */}
+              <div ref={dropdownRef} className="relative category-dropdown">
                 <label className="block text-sm font-medium mb-2">
                   Category *
                 </label>
-                <select
-                  name="categoryId"
-                  value={expense.categoryId}
-                  onChange={handleCategoryChange}
-                  required
-                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-gray-950 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                <div
+                  className="border border-gray-200 rounded-lg bg-[#f9f9fa] text-gray-950 text-sm px-4 py-2.5 cursor-pointer flex justify-between items-center focus-within:ring-2 focus-within:ring-indigo-400"
+                  onClick={() => setShowAddInput((prev) => !prev)}
                 >
-                  {categories.map((cat) => (
-                    <option key={cat._id} value={cat._id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                  <option value="custom">➕ Add Custom Category</option>
-                </select>
+                  <span>
+                    {categories.find((c) => c._id === expense.categoryId)
+                      ?.name || "Select category"}
+                  </span>
+                  <svg
+                    className={`w-4 h-4 text-gray-500 transition-transform ${
+                      showAddInput ? "rotate-180" : ""
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+
+                {showAddInput && (
+                  <div className="absolute left-0 right-0 mt-2 bg-white shadow-lg rounded-lg border border-gray-100 z-10 max-h-56 overflow-y-auto">
+                    {categories.map((cat) => (
+                      <div
+                        key={cat._id}
+                        onClick={() => {
+                          setExpense((prev) => ({
+                            ...prev,
+                            categoryId: cat._id,
+                          }));
+                          setShowAddInput(false);
+                        }}
+                        className={`px-4 py-2 cursor-pointer hover:bg-indigo-50 text-sm ${
+                          expense.categoryId === cat._id
+                            ? "bg-indigo-50 font-medium"
+                            : ""
+                        }`}
+                      >
+                        {cat.name}
+                      </div>
+                    ))}
+                    <div className="border-t border-gray-100 my-1"></div>
+                    <div className="p-3 flex items-center gap-2">
+                      <input
+                        type="text"
+                        placeholder="New category..."
+                        className="flex-1 border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-400"
+                        value={newCategory}
+                        onChange={(e) => setNewCategory(e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddCategory}
+                        className="text-indigo-600 font-medium text-sm hover:underline"
+                      >
+                        + Add
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
