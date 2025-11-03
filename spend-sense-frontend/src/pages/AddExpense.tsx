@@ -208,7 +208,7 @@ const AddExpense: React.FC = () => {
   if (loading) return <div className="p-6">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-white py-9 px-6 flex flex-col mx-18 justify-center">
+    <div className="min-h-screen bg-white py-9 px-6 flex flex-col sm:mx-18 justify-center">
       <div className="flex flex-col items-start justify-between">
         <motion.div
           initial={{ opacity: 0, y: -20 }}

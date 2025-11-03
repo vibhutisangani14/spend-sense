@@ -158,7 +158,7 @@ const EditExpense: React.FC = () => {
   if (!expense) return <div className="p-6">Expense not found</div>;
 
   return (
-    <div className="min-h-screen bg-white py-3 px-6 flex flex-col mx-18 justify-center">
+    <div className="min-h-screen bg-white py-3 px-6 flex flex-col sm:mx-18 justify-center">
       <div className="flex flex-col items-start justify-between mt-6">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -330,25 +330,25 @@ const EditExpense: React.FC = () => {
             </div>
 
             {/* Action buttons */}
-            <div className="flex flex-row gap-4">
+            <div className="w-full flex flex-row gap-4">
               <button
                 type="button"
                 onClick={() => setShowDeleteModal(true)}
-                className="w-32 border border-red-400 text-red-500 rounded-lg px-4 py-2.5 flex items-center justify-center gap-2  bg-[#f9f9fa] text-sm text-black font-semibold hover:bg-[#fff0f0] hover:text-black transition"
+                className="w-1/4 border border-red-400 text-red-500 rounded-lg px-4 py-2.5 flex items-center justify-center gap-2  bg-[#f9f9fa] text-sm text-black font-semibold hover:bg-[#fff0f0] hover:text-black transition"
               >
                 <Trash2 className="w-4 h-4" />
                 Delete
               </button>
               <button
                 type="button"
-                className="w-96 border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-sm text-black font-semibold hover:bg-indigo-700 hover:text-white transition"
+                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-sm text-black font-semibold hover:bg-indigo-700 hover:text-white transition"
                 onClick={() => navigate("/app")}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="w-96 bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] flex items-center justify-center gap-2 text-sm text-white font-semibold py-2.5 rounded-lg hover:opacity-90 transition"
+                className="w-full bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] flex items-center justify-center gap-2 text-sm text-white font-semibold py-2.5 rounded-lg hover:opacity-90 transition"
               >
                 <Save className="w-4 h-4" />
                 Save Expense

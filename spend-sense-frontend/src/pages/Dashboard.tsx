@@ -242,20 +242,21 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-12 gap-6 mt-3 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-12 lg:col-span-12">
-        <div className="p-6 bg-white rounded-xl shadow-xl shadow-gray-400/30  h-full lg:col-span-6">
+      <div className="grid grid-cols-1 gap-6 mt-3 lg:grid-cols-12">
+        {/* Spending Trends */}
+        <div className="p-6 bg-white rounded-xl shadow-xl shadow-gray-400/30 h-full lg:col-span-6">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <h2 className="font-semibold text-lg ">📊 Spending Trends</h2>
+            <h2 className="font-semibold text-lg">📊 Spending Trends</h2>
             <p className="text-slate-600 mt-2 text-sm mb-2">
               Last 6 months overview
             </p>
             <ResponsiveContainer width="100%" height={320}>
               <BarChart
-                data={barData.slice(-6)} // show only last 6 months
+                data={barData.slice(-6)}
                 margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
               >
                 <defs>
@@ -294,7 +295,8 @@ const Dashboard: React.FC = () => {
           </motion.div>
         </div>
 
-        <div className="p-6 bg-white rounded-xl shadow-xl shadow-gray-400/30  h-full lg:col-span-6">
+        {/* Spending by Category */}
+        <div className="p-6 bg-white rounded-xl shadow-xl shadow-gray-400/30 h-[100svw] lg:h-full lg:col-span-6">
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}

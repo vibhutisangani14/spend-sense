@@ -16,8 +16,12 @@ interface User {
   name: string;
   email: string;
 }
+interface SidebarProps {
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
+}
 
-const Sidebar: React.FC = () => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
   const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
 
@@ -48,7 +52,10 @@ const Sidebar: React.FC = () => {
     }
   };
   return (
-    <aside className="w-64 h-screen sticky top-0 bg-[#fafafa] overflow-hidden">
+    <aside
+      className={`w-64 h-screen bg-[#fafafa] shadow-lg fixed top-0 left-0 z-50 transform transition-transform duration-300
+    ${isOpen ? "translate-x-0" : "-translate-x-full sm:translate-x-0"}`}
+    >
       {/* Logo */}
       <div className="p-6 flex items-center gap-3">
         <div className="w-10 h-10 rounded-xl shadow-lg bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-white shadow-indigo-500/30">
@@ -61,7 +68,7 @@ const Sidebar: React.FC = () => {
       </div>
 
       {/* Navigation */}
-      <nav className="p-4">
+      <nav className="p-4 flex flex-col gap-3">
         <NavLink
           to="/app"
           end
