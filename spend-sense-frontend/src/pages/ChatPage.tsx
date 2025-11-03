@@ -1,87 +1,78 @@
-import React, { useState } from "react";
-import { Send, Bot, User, Loader2 } from "lucide-react";
-import { askGemini } from "../services/geminiService";
+import { useState } from "react";
+import { Send, Sparkles, User, Bot } from "lucide-react";
+import { motion } from "framer-motion";
+import axios from "axios";
 
-type ChatMessage = {
-  from: "user" | "bot";
+interface ChatMessage {
+  type: "user" | "ai";
   text: string;
-  time: string;
-};
+}
 
-const ChatPage: React.FC = () => {
-  const [message, setMessage] = useState("");
-  const [chat, setChat] = useState<ChatMessage[]>([]);
-  const [hasStartedChat, setHasStartedChat] = useState(false);
-  const [isThinking, setIsThinking] = useState(false);
+interface ChatResponse {
+  response: string;
+  error?: string;
+}
 
-  const getTime = () => {
-    const now = new Date();
-    return now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  };
+const suggestedQuestions: string[] = [
+  "What's my biggest expense category?",
+  "How much did I spend this month?",
+  "Give me tips to save money",
+  "Analyze my spending patterns",
+  "What's my average daily spending?",
+];
 
-  const typeEffect = async (text: string) => {
-    let typed = "";
-    for (let i = 0; i < text.length; i++) {
-      typed += text[i];
-      setChat((prev) => {
-        const updated = [...prev];
-        updated[updated.length - 1].text = typed;
-        return updated;
-      });
-      await new Promise((res) => setTimeout(res, 15));
-    }
-  };
+export default function ChatWithAI() {
+  const [input, setInput] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([]); // Start empty
+  const [showSuggestions, setShowSuggestions] = useState<boolean>(true);
 
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!message.trim()) return;
+  const handleAsk = async (question: string) => {
+    if (!question.trim()) return;
 
-    setHasStartedChat(true);
-    setIsThinking(true);
+    if (showSuggestions) setShowSuggestions(false);
 
-    const userMsg: ChatMessage = {
-      from: "user",
-      text: message,
-      time: getTime(),
-    };
-    setChat((prev) => [...prev, userMsg]);
-    setMessage("");
-
-    const aiPlaceholder: ChatMessage = {
-      from: "bot",
-      text: "...",
-      time: getTime(),
-    };
-    setChat((prev) => [...prev, aiPlaceholder]);
+    // Add user message
+    setMessages((prev) => [...prev, { type: "user", text: question }]);
+    setInput("");
+    setLoading(true);
 
     try {
-      const reply = await askGemini(message);
-      setIsThinking(false);
-      await typeEffect(reply);
-    } catch {
-      setIsThinking(false);
-      setChat((prev) => {
-        const updated = [...prev];
-        updated[updated.length - 1].text =
-          "⚠️ Connection error. Please try again.";
-        return updated;
-      });
-    }
-  };
+      const { data } = await axios.post<ChatResponse>(
+        "http://localhost:3000/api/chat",
+        { question },
+        { withCredentials: true }
+      );
 
-  const handleSuggestionClick = (text: string) => {
-    setMessage(text);
+      if (data.error) throw new Error(data.error);
+
+      // Add AI response
+      setMessages((prev) => [...prev, { type: "ai", text: data.response }]);
+    } catch (err: any) {
+      console.error("Axios error:", err.response?.data ?? err.message);
+      setMessages((prev) => [
+        ...prev,
+        { type: "ai", text: "Something went wrong. Please try again." },
+      ]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-white flex justify-center px-6">
-      <div className="w-full max-w-5xl bg-white rounded-3xl shadow-[0_0_45px_rgba(0,0,0,0.07)] border border-gray-100 flex flex-col p-10 mt-0">
-        <div className="flex items-center gap-3 mb-6 sticky top-0 bg-white z-10 pb-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-md">
-            <Bot className="w-6 h-6" />
+    <div className="min-h-screen bg-white py-8 px-4 pb-25 flex flex-col mx-12 justify-center">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-3"
+      >
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
+            <Sparkles className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold text-gray-800">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-500 to-cyan-600 bg-clip-text text-transparent">
               AI Financial Assistant
             </h1>
             <p className="text-gray-500 text-sm">
@@ -89,114 +80,123 @@ const ChatPage: React.FC = () => {
             </p>
           </div>
         </div>
+      </motion.div>
 
-        <div className="flex-1 overflow-y-auto rounded-2xl bg-white p-6 space-y-6 shadow-inner border border-gray-100 transition-all duration-500">
-          {!hasStartedChat && (
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-xl flex items-center justify-center text-white shadow-sm">
-                <Bot size={20} />
-              </div>
-              <div className="bg-white px-5 py-3 rounded-2xl text-[15px] text-gray-700 shadow-sm border border-gray-100 max-w-[80%] leading-relaxed">
-                Hi! I'm your AI financial assistant. I can help you understand
-                your spending habits, provide saving tips, and answer questions
-                about your expenses. What would you like to know?
-                <div className="text-xs text-gray-400 mt-1">{getTime()}</div>
-              </div>
-            </div>
-          )}
-
-          {chat.map((msg, i) => (
-            <div
-              key={i}
-              className={`flex ${
-                msg.from === "user" ? "justify-end" : "items-start gap-4"
-              }`}
-            >
-              {msg.from === "bot" && (
-                <div className="w-10 h-10 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-xl flex items-center justify-center text-white shadow-sm">
-                  <Bot size={18} />
-                </div>
-              )}
-
-              <div
-                className={`px-5 py-3 rounded-2xl text-[15px] shadow-sm max-w-[75%] leading-relaxed transition-all ${
-                  msg.from === "user"
-                    ? "bg-[linear-gradient(135deg,#6366f1,#8b5cf6)] text-white"
-                    : "bg-white border border-gray-100 text-gray-700"
-                }`}
-              >
-                {msg.text}
-                <div
-                  className={`text-xs mt-1 ${
-                    msg.from === "user" ? "text-indigo-100" : "text-gray-400"
-                  }`}
-                >
-                  {msg.time}
-                </div>
-              </div>
-
-              {msg.from === "user" && (
-                <div className="w-10 h-10 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-xl flex items-center justify-center text-white shadow-sm ml-3">
-                  <User size={18} />
-                </div>
-              )}
-            </div>
-          ))}
-
-          {isThinking && (
-            <div className="flex items-center gap-3 text-gray-500 ml-12">
-              <Loader2 className="animate-spin w-4 h-4" />
-              <span>Thinking...</span>
-            </div>
-          )}
-
-          {!hasStartedChat && (
-            <div className="ml-14 space-y-3 fade-in">
-              <p className="text-gray-600 font-medium">Try asking:</p>
-              <div className="flex flex-wrap gap-3">
-                {[
-                  "What's my biggest expense category?",
-                  "How much did I spend this month?",
-                  "Give me tips to save money",
-                  "Analyze my spending patterns",
-                  "What's my average daily spending?",
-                ].map((text, i) => (
-                  <button
-                    key={i}
-                    onClick={() => handleSuggestionClick(text)}
-                    className="px-4 py-2 text-sm text-gray-700 border border-gray-200 rounded-full bg-white cursor-pointer 
-                               hover:text-white hover:bg-[linear-gradient(135deg,#6366f1,#8b5cf6)] 
-                               hover:border-transparent transition-all duration-300"
-                  >
-                    {text}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+      {/* Chat window */}
+      <div className="flex-1 overflow-y-auto flex flex-col gap-2 px-6 py-4 shadow-2xl mt-4">
+        {/* Default AI greeting */}
+        <div className="flex justify-start items-start gap-2">
+          <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br from-emerald-400 to-cyan-500">
+            <Bot className="w-5 h-5 text-white" />
+          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="px-4 py-2 rounded-2xl max-w-[80%] text-sm break-words bg-white text-gray-800 border border-gray-200"
+          >
+            👋 Hi! I'm your AI financial assistant. I can help you understand
+            your spending habits, provide savings tips, and answer questions
+            about your expenses. What would you like to know?
+          </motion.div>
         </div>
 
-        <form
-          onSubmit={handleSend}
-          className="mt-5 flex items-center gap-3 border border-gray-200 rounded-full px-5 py-2.5 shadow-sm bg-white sticky bottom-4"
-        >
-          <input
-            type="text"
-            placeholder="Ask about your expenses..."
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            className="flex-1 text-base text-gray-700 placeholder-gray-400 outline-none"
-          />
-          <button
-            type="submit"
-            className="bg-gradient-to-r from-indigo-400 to-purple-500 text-white p-3 rounded-full hover:scale-105 transition-transform shadow-md"
+        {/* Suggested questions */}
+        {showSuggestions && (
+          <div>
+            <p className="text-sm text-gray-500 font-medium py-2">
+              Try asking:
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {suggestedQuestions.map((q, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleAsk(q)}
+                  className="bg-gray-100 hover:bg-blue-100 text-sm px-3 py-1 rounded-full transition"
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* User & AI messages with white bubbles and gray border */}
+        {messages.map((msg, i) => (
+          <div
+            key={i}
+            className={`flex items-start gap-2 ${
+              msg.type === "user" ? "justify-end" : "justify-start"
+            }`}
           >
-            <Send size={18} />
+            {msg.type === "ai" && (
+              <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br from-emerald-400 to-cyan-500">
+                <Bot className="w-5 h-5 text-white" />
+              </div>
+            )}
+
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`px-4 py-2 rounded-2xl max-w-[80%] text-sm break-words bg-white border border-gray-200 ${
+                msg.type === "user"
+                  ? "text-blue-600 rounded-br-none"
+                  : "text-gray-800 rounded-bl-none"
+              }`}
+            >
+              {msg.text}
+            </motion.div>
+
+            {msg.type === "user" && (
+              <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-blue-600">
+                <User className="w-5 h-5 text-white" />
+              </div>
+            )}
+          </div>
+        ))}
+
+        {/* AI typing bubble */}
+        {loading && (
+          <div className="flex justify-start items-start gap-2">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br from-emerald-400 to-cyan-500">
+              <Bot className="w-5 h-5 text-white" />
+            </div>
+            <motion.div
+              animate={{ opacity: [0.3, 1, 0.3] }}
+              transition={{ repeat: Infinity, duration: 1 }}
+              className="bg-white text-gray-800 border border-gray-200 px-4 py-2 rounded-2xl max-w-[50%] flex items-center gap-2"
+            >
+              <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></span>
+              <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-150"></span>
+              <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-300"></span>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Input section at bottom */}
+        <div className="mt-auto flex flex-row gap-2">
+          <div className="flex items-center bg-[#f9f9fa] gap-2 border border-gray-200 rounded-md px-3 py-2 w-full">
+            <input
+              type="text"
+              placeholder="Ask about your expenses..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              className="flex-1 outline-none text-sm text-gray-950"
+              onKeyDown={(e) => e.key === "Enter" && handleAsk(input)}
+            />
+          </div>
+          <button
+            onClick={() => handleAsk(input)}
+            disabled={!input || loading}
+            className={`px-4 rounded-md text-white transition ${
+              loading
+                ? "bg-gray-400"
+                : "bg-gradient-to-r from-emerald-500 to-cyan-600 hover:from-emerald-600 hover:to-cyan-700 shadow-md shadow-emerald-500/30"
+            }`}
+          >
+            <Send className="w-4 h-4" />
           </button>
-        </form>
+        </div>
       </div>
     </div>
   );
-};
-
-export default ChatPage;
+}

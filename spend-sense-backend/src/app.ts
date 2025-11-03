@@ -4,6 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { errorHandler } from "#middleware";
 import cookieParser from "cookie-parser";
+import { router } from "services";
 
 import {
   categoryRouter,
@@ -26,7 +27,6 @@ app.use(
     exposedHeaders: ["WWW-Authenticate"], // needed to send the 'refresh trigger''
   })
 );
-// app.use(express.json(), cookieParser());
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(cookieParser());
@@ -37,8 +37,8 @@ app.use("/api/categories", categoryRouter);
 app.use("/api/users", userRouter);
 app.use("/api/expenses", expenseRouter);
 app.use("/api/paymentMethods", paymentMethodRouter);
+app.use("/api/chat", router);
 
-// ✅ Fallback route for unknown paths
 app.use((req, res) => {
   res.status(404).json({ message: "Not Found" });
 });
@@ -47,7 +47,7 @@ app.use((req, res) => {
 app.use(errorHandler);
 
 app.listen(port, () => {
-  console.log(`✅ Server is running on port ${port}`);
+  console.log(`Server is running on port ${port}`);
 });
 
 export default app;
