@@ -158,7 +158,7 @@ const EditExpense: React.FC = () => {
   if (!expense) return <div className="p-6">Expense not found</div>;
 
   return (
-    <div className="min-h-screen bg-white py-3 px-6 flex flex-col mx-18 justify-center">
+    <div className="min-h-screen bg-white py-3 px-6 flex flex-col sm:mx-18 justify-center">
       <div className="flex flex-col items-start justify-between mt-6">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
