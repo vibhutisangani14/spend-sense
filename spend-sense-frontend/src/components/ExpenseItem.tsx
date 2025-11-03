@@ -82,7 +82,6 @@ const categoryConfig: {
   },
 };
 
-// Map your categories to icons
 const categoryIcons: Record<string, React.ReactNode> = {
   Education: <FcReading className="text-3xl" />,
   "Food & Dining": <MdFastfood className="text-3xl" />,
@@ -99,7 +98,8 @@ const categoryIcons: Record<string, React.ReactNode> = {
 const ExpenseItem: React.FC<APIExpense> = ({ e }) => {
   const navigate = useNavigate();
   const Icon = categoryIcons[e.category] || <FcEmptyFilter />;
-  const config = categoryConfig[e.category] || categoryConfig.other;
+  // 🔧 fixed line below:
+  const config = categoryConfig[e.category] || categoryConfig["Other"];
 
   const handleEdit = () => {
     navigate(`/app/editExpense/${e._id}`);
@@ -109,14 +109,13 @@ const ExpenseItem: React.FC<APIExpense> = ({ e }) => {
     if (!receiptBase64) return;
 
     try {
-      // Extract MIME type and base64 data
       const matches = receiptBase64.match(/^data:(.*?);base64,(.*)$/);
       if (!matches) {
         console.error("Invalid base64 format");
         return;
       }
 
-      const mimeType = matches[1]; // e.g. "image/jpeg"
+      const mimeType = matches[1];
       const base64Data = matches[2];
       const byteCharacters = atob(base64Data);
       const byteNumbers = new Array(byteCharacters.length);
@@ -127,8 +126,6 @@ const ExpenseItem: React.FC<APIExpense> = ({ e }) => {
 
       const byteArray = new Uint8Array(byteNumbers);
       const blob = new Blob([byteArray], { type: mimeType });
-
-      // Generate a downloadable URL
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -138,7 +135,6 @@ const ExpenseItem: React.FC<APIExpense> = ({ e }) => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
       URL.revokeObjectURL(url);
     } catch (err) {
       console.error("❌ Failed to download receipt:", err);
@@ -182,7 +178,6 @@ const ExpenseItem: React.FC<APIExpense> = ({ e }) => {
             <Receipt size={20} />
           </button>
         )}
-
         <button type="button" onClick={handleEdit}>
           <Pencil size={20} />
         </button>
