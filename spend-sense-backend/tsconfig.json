@@ -24,7 +24,9 @@
       "#schemas": ["schemas/index.ts"],
       "#schemas/*": ["schemas/*"],
       "#middleware": ["middleware/index.ts"],
-      "#middleware/*": ["middleware/*"]
+      "#middleware/*": ["middleware/*"],
+      "#services": ["services/index.ts"],
+      "#services/*": ["services/*"]
     }
   },
   "include": ["src/**/*.ts"],
