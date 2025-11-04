@@ -1,4 +1,4 @@
-import "#db";
+import { connectDB } from "#db";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -46,8 +46,10 @@ app.use((req, res) => {
 // Global error handler
 app.use(errorHandler);
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+connectDB().then(() => {
+  app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+  });
 });
 
 export default app;
