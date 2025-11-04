@@ -16,10 +16,11 @@ router.post("/", async (req: Request, res: Response) => {
   if (!question) {
     return res.status(400).json({ error: "Question is required." });
   }
+  const BASE_API_URL = process.env.BASE_API_URL!;
 
   try {
     // Fetch expense data
-    const expenseResponse = await fetch("http://localhost:3000/api/expenses", {
+    const expenseResponse = await fetch(`${BASE_API_URL}/expenses`, {
       headers: {
         cookie: req.headers.cookie || "", // forward cookies from client request
       },

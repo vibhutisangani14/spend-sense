@@ -9,12 +9,13 @@ type Prediction = {
 };
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const BASE_API_URL = process.env.BASE_API_URL!;
 
 /** Fetch all categories from your existing API */
 let cachedCategories: Category[] | null = null;
 async function getCategories(): Promise<Category[]> {
   if (cachedCategories) return cachedCategories;
-  const res = await fetch("http://localhost:3000/api/categories");
+  const res = await fetch(`${BASE_API_URL}/categories`);
   if (!res.ok) throw new Error("Failed to fetch categories");
   cachedCategories = (await res.json()) as Category[];
   return cachedCategories;
