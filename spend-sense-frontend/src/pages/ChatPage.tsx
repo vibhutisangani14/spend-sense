@@ -39,7 +39,7 @@ export default function ChatWithAI() {
 
     try {
       const { data } = await axios.post<ChatResponse>(
-        "http://localhost:3000/api/chat",
+        `${import.meta.env.VITE_API_URL}/chat`,
         { question },
         { withCredentials: true }
       );
@@ -68,11 +68,11 @@ export default function ChatWithAI() {
         className="mb-3"
       >
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
+          <div className="w-12 h-12  bg-gradient-to-br from-primary to-purple-500  rounded-xl flex items-center justify-center shadow-lg">
             <Sparkles className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-500 to-cyan-600 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold  bg-gradient-to-br from-primary to-purple-500  bg-clip-text text-transparent">
               AI Financial Assistant
             </h1>
             <p className="text-gray-500 text-sm">
@@ -85,14 +85,14 @@ export default function ChatWithAI() {
       {/* Chat window */}
       <div className="flex-1 overflow-y-auto flex flex-col gap-2 px-6 py-4 shadow-2xl mt-4">
         {/* Default AI greeting */}
-        <div className="flex justify-start items-start gap-2">
-          <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br from-emerald-400 to-cyan-500">
+        <div className="flex justify-start items-start gap-2 mt-2">
+          <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center  bg-gradient-to-br from-primary to-purple-500">
             <Bot className="w-5 h-5 text-white" />
           </div>
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="px-4 py-2 rounded-2xl max-w-[80%] text-sm break-words bg-white text-gray-800 border border-gray-200"
+            className="px-4 py-3 rounded-2xl max-w-[80%] text-sm break-words bg-white text-gray-800 border border-gray-200"
           >
             👋 Hi! I'm your AI financial assistant. I can help you understand
             your spending habits, provide savings tips, and answer questions
@@ -103,7 +103,7 @@ export default function ChatWithAI() {
         {/* Suggested questions */}
         {showSuggestions && (
           <div>
-            <p className="text-sm text-gray-500 font-medium py-2">
+            <p className="text-sm text-gray-500 font-medium py-2 mb-1">
               Try asking:
             </p>
             <div className="flex flex-wrap gap-2">
@@ -111,7 +111,7 @@ export default function ChatWithAI() {
                 <button
                   key={i}
                   onClick={() => handleAsk(q)}
-                  className="bg-gray-100 hover:bg-blue-100 text-sm px-3 py-1 rounded-full transition"
+                  className="border border-gray-200 hover:bg-blue-100 text-sm font-semibold bg-[#f9f9fa] text-black px-3 py-2 rounded-md transition"
                 >
                   {q}
                 </button>
@@ -120,7 +120,6 @@ export default function ChatWithAI() {
           </div>
         )}
 
-        {/* User & AI messages with white bubbles and gray border */}
         {messages.map((msg, i) => (
           <div
             key={i}
@@ -129,7 +128,7 @@ export default function ChatWithAI() {
             }`}
           >
             {msg.type === "ai" && (
-              <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br from-emerald-400 to-cyan-500">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center  bg-gradient-to-br from-primary to-purple-500">
                 <Bot className="w-5 h-5 text-white" />
               </div>
             )}
@@ -137,17 +136,17 @@ export default function ChatWithAI() {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className={`px-4 py-2 rounded-2xl max-w-[80%] text-sm break-words bg-white border border-gray-200 ${
+              className={`px-4 py-2 max-w-[80%] text-sm break-words bg-white border border-gray-200 ${
                 msg.type === "user"
-                  ? "text-blue-600 rounded-br-none"
-                  : "text-gray-800 rounded-bl-none"
+                  ? "text-white bg-gradient-to-br from-primary to-purple-500 py-3 rounded-2xl"
+                  : "text-gray-800 rounded-2xl"
               }`}
             >
               {msg.text}
             </motion.div>
 
             {msg.type === "user" && (
-              <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-blue-600">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center  bg-gradient-to-br from-primary to-purple-500">
                 <User className="w-5 h-5 text-white" />
               </div>
             )}
@@ -156,14 +155,14 @@ export default function ChatWithAI() {
 
         {/* AI typing bubble */}
         {loading && (
-          <div className="flex justify-start items-start gap-2">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br from-emerald-400 to-cyan-500">
+          <div className="flex justify-start items-center gap-2">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br from-primary to-purple-500">
               <Bot className="w-5 h-5 text-white" />
             </div>
             <motion.div
               animate={{ opacity: [0.3, 1, 0.3] }}
               transition={{ repeat: Infinity, duration: 1 }}
-              className="bg-white text-gray-800 border border-gray-200 px-4 py-2 rounded-2xl max-w-[50%] flex items-center gap-2"
+              className="bg-white text-gray-800 border border-gray-200 px-4 py-4 rounded-2xl max-w-[50%] flex items-center gap-2"
             >
               <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></span>
               <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-150"></span>
@@ -190,7 +189,7 @@ export default function ChatWithAI() {
             className={`px-4 rounded-md text-white transition ${
               loading
                 ? "bg-gray-400"
-                : "bg-gradient-to-r from-emerald-500 to-cyan-600 hover:from-emerald-600 hover:to-cyan-700 shadow-md shadow-emerald-500/30"
+                : " bg-gradient-to-br from-primary to-purple-500  hover:from-purple-800 hover:to-primary shadow-md shadow-purple-500/30"
             }`}
           >
             <Send className="w-4 h-4" />

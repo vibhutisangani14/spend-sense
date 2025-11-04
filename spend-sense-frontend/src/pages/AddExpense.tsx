@@ -119,7 +119,7 @@ const AddExpense: React.FC = () => {
         setLoadingCategory(true);
         try {
           const res = await fetch(
-            "http://localhost:3000/api/predict-category",
+            `${import.meta.env.VITE_API_URL}/predict-category`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
