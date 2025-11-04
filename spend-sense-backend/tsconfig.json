@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "ESNext", // instead of "CommonJS"
-    "moduleResolution": "Node",
+    "module": "NodeNext", // <-- must match NodeNext resolution
+    "moduleResolution": "NodeNext",
     "rootDir": "./src",
     "outDir": "./dist",
     "strict": true,
-    "esModuleInterop": true,
+    "esModuleInterop": true, // allows default imports from CommonJS modules
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
