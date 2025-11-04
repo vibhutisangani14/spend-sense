@@ -1,5 +1,5 @@
 import { z } from "zod/v4";
-import { dbEntrySchema } from "./shared";
+import { dbEntrySchema } from "./shared.js";
 
 const categoryInputSchema = z.strictObject({
   name: z

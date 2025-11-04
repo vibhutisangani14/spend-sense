@@ -1,5 +1,5 @@
 import express from "express";
-import { categoryPredictor } from "../services/categoryPredictor";
+import { categoryPredictor } from "../services/categoryPredictor.js";
 import { validateBody } from "#middleware";
 import { predictedcategoryInputSchema } from "#schemas";
 

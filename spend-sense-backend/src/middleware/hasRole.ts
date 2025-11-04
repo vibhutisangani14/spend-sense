@@ -1,7 +1,7 @@
 import type { RequestHandler } from "express";
 import { Expense } from "#models";
 
-const hasRole = (...allowedRoles: string[]): RequestHandler => {
+export const hasRole = (...allowedRoles: string[]): RequestHandler => {
   return async (req, _res, next) => {
     if (!req.user) {
       next(new Error("Unauthorized", { cause: { status: 401 } }));
@@ -53,4 +53,3 @@ const hasRole = (...allowedRoles: string[]): RequestHandler => {
 };
 
 // hasRole('user', 'admin', 'self');
-export default hasRole;

@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "CommonJS",
-    "moduleResolution": "Node",
+    "module": "NodeNext", // <-- must match NodeNext resolution
+    "moduleResolution": "NodeNext",
     "rootDir": "./src",
     "outDir": "./dist",
     "strict": true,
-    "esModuleInterop": true,
+    "esModuleInterop": true, // allows default imports from CommonJS modules
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
@@ -24,7 +24,13 @@
       "#schemas": ["schemas/index.ts"],
       "#schemas/*": ["schemas/*"],
       "#middleware": ["middleware/index.ts"],
-      "#middleware/*": ["middleware/*"]
+      "#middleware/*": ["middleware/*"],
+      "#services": ["services/index.ts"],
+      "#services/*": ["services/*"],
+      "#utils": ["utils/index.ts"],
+      "#utils/*": ["utils/*"],
+      "#routes": ["routes/index.ts"],
+      "#routes/*": ["routes/*"]
     }
   },
   "include": ["src/**/*.ts"],

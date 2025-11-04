@@ -51,7 +51,6 @@ export const updateUserById: RequestHandler<
   res.json(updatedUser as any);
 };
 
-
 export const deleteUserById: RequestHandler<
   { id: string },
   { message: string }

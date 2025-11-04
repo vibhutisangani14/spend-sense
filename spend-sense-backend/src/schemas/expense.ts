@@ -1,9 +1,9 @@
 import { z } from "zod/v4";
-import { dbEntrySchema } from "./shared";
+import { dbEntrySchema } from "./shared.js";
 import { isValidObjectId, Types } from "mongoose";
-import { categoryInputSchema } from "./category";
-import { userInputSchema } from "./users";
-import { paymentMethodInputSchema } from "./paymentMethod";
+import { categoryInputSchema } from "./category.js";
+import { userInputSchema } from "./users.js";
+import { paymentMethodInputSchema } from "./paymentMethod.js";
 
 const expenseInputSchema = z.strictObject({
   title: z
