@@ -2,9 +2,11 @@ import { User } from "#models";
 import type { RequestHandler } from "express";
 import { isValidObjectId } from "mongoose";
 import type { z } from "zod";
-import { userInputSchema, userSchema } from "#schemas";
+import { userInputSchema, userInputEditSchema, userSchema } from "#schemas";
 
 type UserInputDTO = z.infer<typeof userInputSchema>;
+type UserInputEditDTO = z.infer<typeof userInputEditSchema>;
+
 type UserDTO = z.infer<typeof userSchema>;
 
 export const getAllUsers: RequestHandler<{}, UserDTO[]> = async (req, res) => {
@@ -34,7 +36,7 @@ export const getUserById: RequestHandler<{ id: string }, UserDTO> = async (
 export const updateUserById: RequestHandler<
   { id: string },
   UserDTO,
-  UserInputDTO
+  UserInputEditDTO
 > = async (req, res) => {
   const { id } = req.params;
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Save, ArrowLeft, Sparkles, Check } from "lucide-react";
+import { Save, ArrowLeft, Sparkles, Check, Upload } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface Category {
@@ -141,7 +141,6 @@ const AddExpense: React.FC = () => {
     }
   };
 
-  // 🟣 Add Custom Category Option
   const handleCategoryChange = async (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
@@ -155,7 +154,6 @@ const AddExpense: React.FC = () => {
             { name: newCategoryName },
             { withCredentials: true }
           );
-          // Add new category to list
           setCategories((prev) => [...prev, res.data]);
           setExpense((prev) => ({ ...prev, categoryId: res.data._id }));
         } catch (err) {
@@ -296,6 +294,42 @@ const AddExpense: React.FC = () => {
                     <button
                       type="button"
                       className="btn bg-green-600 text-white px-3 py-1 rounded-lg text-sm flex items-center gap-1"
+                      onClick={() => {
+                        const matchedCategory = categories.find(
+                          (cat) =>
+                            cat.name.toLowerCase() === prediction.toLowerCase()
+                        );
+
+                        if (matchedCategory) {
+                          setExpense((prev) => ({
+                            ...prev,
+                            categoryId: matchedCategory._id,
+                          }));
+                        } else {
+                          const createCategory = async () => {
+                            try {
+                              const res = await axios.post(
+                                `${import.meta.env.VITE_API_URL}/categories`,
+                                { name: prediction },
+                                { withCredentials: true }
+                              );
+                              setCategories((prev) => [...prev, res.data]);
+                              setExpense((prev) => ({
+                                ...prev,
+                                categoryId: res.data._id,
+                              }));
+                            } catch (err) {
+                              console.error("Failed to create category", err);
+                              alert(
+                                "Failed to accept AI suggestion. Try again."
+                              );
+                            }
+                          };
+                          createCategory();
+                        }
+
+                        setPrediction(null);
+                      }}
                     >
                       <Check className="w-4 h-4" /> Accept
                     </button>
@@ -394,11 +428,23 @@ const AddExpense: React.FC = () => {
               <label className="block text-sm font-medium mb-2">
                 Receipt (Optional)
               </label>
+
               <label
                 htmlFor="receipt-upload"
                 className="flex items-center justify-center gap-2 border border-gray-200 rounded-lg px-4 py-3 bg-[#f9f9fa] text-sm text-gray-700 cursor-pointer hover:border-indigo-500 hover:text-indigo-600 transition-all"
               >
-                <span>{receipt ? "Receipt Selected" : "Upload Receipt"}</span>
+                {receipt ? (
+                  <>
+                    <Upload className="w-4 h-4 text-gray-600" />
+                    <span>Receipt Selected</span>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4 text-gray-600" />
+                    <span>Upload Receipt</span>
+                  </>
+                )}
+
                 <input
                   id="receipt-upload"
                   type="file"
@@ -407,6 +453,17 @@ const AddExpense: React.FC = () => {
                   className="hidden"
                 />
               </label>
+
+              {receipt && (
+                <motion.p
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-xs text-green-600 font-medium mt-2 flex items-center gap-1"
+                >
+                  <Check className="w-3 h-3 text-green-600" />
+                  Receipt added successfully
+                </motion.p>
+              )}
             </div>
 
             {/* BUTTONS */}

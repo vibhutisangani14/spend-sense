@@ -7,7 +7,7 @@ import {
   deleteUserById,
 } from "#controllers";
 import { validateBody } from "#middleware";
-import { userInputSchema } from "#schemas";
+import { userInputSchema, userInputEditSchema } from "#schemas";
 
 const userRouter = Router();
 
@@ -18,7 +18,7 @@ userRouter
 userRouter
   .route("/:id")
   .get(getUserById)
-  .put(validateBody(userInputSchema), updateUserById)
+  .put(validateBody(userInputEditSchema), updateUserById)
   .delete(deleteUserById);
 
 export default userRouter;

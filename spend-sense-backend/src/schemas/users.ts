@@ -10,9 +10,20 @@ const userInputSchema = z.strictObject({
   password: z.string().min(8, "Password must be at least 6 characters long"),
 });
 
+const userInputEditSchema = z.strictObject({
+  name: z
+    .string()
+    .min(1, "Name is required")
+    .max(255, "Maximum name length is 255 characters"),
+  email: z.email().trim().toLowerCase(),
+  password: z
+    .string()
+    .min(8, "Password must be at least 6 characters long")
+    .optional(),
+});
 const userSchema = z.strictObject({
   ...userInputSchema.shape,
   ...dbEntrySchema.shape,
 });
 
-export { userInputSchema, userSchema };
+export { userInputSchema, userSchema, userInputEditSchema };
