@@ -6,7 +6,7 @@
   "main": "dist/app.js",
   "scripts": {
     "dev": "tsx watch src/app.ts",
-    "prebuild": "rimraf dist",
+    "prebuild": "rm -rf dist",
     "build": "tsc",
     "start": "node dist/app.js"
   },
@@ -58,7 +58,6 @@
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.18.12",
-    "rimraf": "^5.0.0",
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.20.6",
     "typescript": "5.4"
