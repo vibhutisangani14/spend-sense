@@ -23,6 +23,7 @@ interface Expense {
   notes?: string;
   userId: string;
 }
+
 interface User {
   _id: string;
   name: string;
@@ -34,7 +35,7 @@ const AddExpense: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
-  const [receipt, setReceipt] = useState<File | null>(null);
+  const [receipt, setReceipt] = useState<string | null>(null); // Base64 string
   const [prediction, setPrediction] = useState<string | null>(null);
   const [loadingCategory, setLoadingCategory] = useState(false);
   const [predictionTimeout, setPredictionTimeout] = useState<number | null>(
@@ -43,7 +44,7 @@ const AddExpense: React.FC = () => {
 
   const [expense, setExpense] = useState<Expense>({
     title: "",
-    amount: "" as unknown as number,
+    amount: 0,
     categoryId: "",
     date: new Date().toISOString().slice(0, 10),
     paymentMethodId: "",
@@ -109,7 +110,6 @@ const AddExpense: React.FC = () => {
     const { name, value } = e.target;
     setExpense((prev) => ({ ...prev, [name]: value }));
 
-    // AI Prediction Logic
     if (predictionTimeout) {
       clearTimeout(predictionTimeout);
     }
@@ -168,12 +168,14 @@ const AddExpense: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user?._id) return;
+
     try {
       const payload = {
         ...expense,
         amount: Number(expense.amount),
-        userId: user?._id,
-        receipt: receipt || "",
+        userId: user._id,
+        receipt: receipt || "", // Send empty string if no receipt
       };
 
       const response = await axios.post(
@@ -198,7 +200,7 @@ const AddExpense: React.FC = () => {
 
     const reader = new FileReader();
     reader.onloadend = () => {
-      setReceipt(reader.result as string);
+      setReceipt(reader.result as string); // Save Base64 string
     };
     reader.readAsDataURL(file);
   };
@@ -257,7 +259,6 @@ const AddExpense: React.FC = () => {
                 💡 Type a description and AI will suggest the best category
               </p>
 
-              {/* AI Suggestion */}
               {loadingCategory && (
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -428,7 +429,6 @@ const AddExpense: React.FC = () => {
               <label className="block text-sm font-medium mb-2">
                 Receipt (Optional)
               </label>
-
               <label
                 htmlFor="receipt-upload"
                 className="flex items-center justify-center gap-2 border border-gray-200 rounded-lg px-4 py-3 bg-[#f9f9fa] text-sm text-gray-700 cursor-pointer hover:border-indigo-500 hover:text-indigo-600 transition-all"

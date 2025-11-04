@@ -18,10 +18,9 @@ interface User {
 }
 interface SidebarProps {
   isOpen: boolean;
-  setIsOpen: (open: boolean) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
   const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
 

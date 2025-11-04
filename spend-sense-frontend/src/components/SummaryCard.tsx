@@ -18,20 +18,21 @@ const SummaryCard: React.FC<SummaryCardProps> = ({
 }) => {
   return (
     <motion.div
-      className="h-full"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 1 * 0.1 }}
     >
-      <div className="p-4 sm:p-6 bg-white rounded-xl shadow-lg shadow-gray-400/30 relative overflow-hidden h-full flex flex-col justify-between">
+      <div className="p-3 sm:p-4 bg-white rounded-xl shadow-lg relative overflow-hidden flex flex-col justify-between h-full">
         <div
           className={`absolute top-0 right-0 w-16 h-16 sm:w-20 sm:h-20 ${color} rounded-bl-full`}
         ></div>
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative z-10">
           <div className="mb-4 sm:mb-0">
-            <div className="text-sm sm:text-base text-slate-400">{title}</div>
-            <div className="text-xl sm:text-2xl font-extrabold mt-1 sm:mt-2">
+            <div className="text-sm sm:text-sm text-slate-500 font-semibold">
+              {title}
+            </div>
+            <div className="text-2xl sm:text-3xl font-bold mt-1 sm:mt-2">
               {value}
             </div>
             {subtitle && (

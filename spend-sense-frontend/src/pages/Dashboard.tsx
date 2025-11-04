@@ -275,7 +275,11 @@ const Dashboard: React.FC = () => {
                 <XAxis dataKey="month" tickLine={false} />
                 <YAxis tickLine={false} tickFormatter={(v) => `€${v}`} />
                 <Tooltip
-                  formatter={(value) => [`€${value.toFixed(2)}`, "Amount"]}
+                  formatter={(value) =>
+                    typeof value === "number"
+                      ? [`€${value.toFixed(2)}`, "Amount"]
+                      : [value, "Amount"]
+                  }
                   cursor={{ fill: "rgba(124,58,237,0.1)" }}
                 />
                 <Bar
