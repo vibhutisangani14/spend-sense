@@ -237,9 +237,7 @@ const AddExpense: React.FC = () => {
         transition={{ delay: 0.1 }}
       >
         <div className="w-full bg-white rounded-2xl shadow-lg">
-          <h2 className="text-2xl font-semibold mt-3 mb-3 py-1.5 px-6">
-            Expense Details
-          </h2>
+          <h2 className="text-2xl font-semibold py-5 px-6">Expense Details</h2>
           <div className="border border-gray-100"></div>
 
           <form onSubmit={handleSubmit} className="space-y-6 p-6">

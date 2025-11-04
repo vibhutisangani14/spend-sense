@@ -22,7 +22,7 @@ const MainLayout: React.FC = () => {
       </header>
 
       {/* Sidebar */}
-      <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+      <Sidebar isOpen={isSidebarOpen} />
 
       {/* Main content */}
       <main className="flex-1 bg-[url('')] min-h-screen transition-all duration-300 mt-16 sm:mt-0 sm:ml-64">

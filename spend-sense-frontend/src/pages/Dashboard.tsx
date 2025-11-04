@@ -41,9 +41,10 @@ interface Expense {
   title: string;
   amount: number;
   category: string;
-  method?: string;
+  method: string;
   date: string;
   note?: string;
+  receipt?: string;
 }
 
 interface Category {
@@ -75,13 +76,13 @@ const Dashboard: React.FC = () => {
           ),
         ]);
 
-        const mapped = exp.map((e: any) => ({
+        const mapped: Expense[] = exp.map((e: any) => ({
           _id: e._id,
           title: e.title,
           amount: e.amount,
           category: e.categoryId?.name || e.category || "Other",
           method: e.method || "Unknown",
-          date: e.date,
+          date: new Date(e.date).toISOString(), // ensure string
           note: e.notes || "",
           receipt: e.receipt || "",
         }));
@@ -155,12 +156,9 @@ const Dashboard: React.FC = () => {
     filteredExpenses.forEach((e) => {
       const date = new Date(e.date);
       const month = months[date.getMonth()];
-      monthlyTotals[month] = (monthlyTotals[month] || 0) + e.amount;
+      monthlyTotals[month] += e.amount;
     });
-    return months.map((month) => ({
-      month,
-      amount: monthlyTotals[month] || 0,
-    }));
+    return months.map((month) => ({ month, amount: monthlyTotals[month] }));
   }, [filteredExpenses]);
 
   const now = new Date();
@@ -183,6 +181,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="flex-1 p-6 lg:p-10 bg-[#f7f8f9]">
+      {/* Header and Summary Cards */}
       <div className="flex items-center mb-6 justify-between">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -198,18 +197,17 @@ const Dashboard: React.FC = () => {
               {`. ${expenses.length} expenses loaded`}
             </p>
           </div>
-
           <div className="flex justify-end gap-3 w-full md:w-auto">
             <Link
               to="/app/addExpense"
               className="btn border-none bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] text-white shadow-lg shadow-indigo-500/30 px-5 py-2 rounded-lg flex items-center gap-2"
             >
-              <Plus className="w-4 h-4" />
-              Add Expense
+              <Plus className="w-4 h-4" /> Add Expense
             </Link>
           </div>
         </motion.div>
       </div>
+
       <div className="col-span-12 lg:col-span-8 mb-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
           <SummaryCard
@@ -234,7 +232,7 @@ const Dashboard: React.FC = () => {
           />
           <SummaryCard
             title="Payment Methods"
-            value={paymentMethods.length.toFixed(2)}
+            value={paymentMethods.length.toString()}
             subtitle="Active methods"
             icon={<CreditCard className="w-6 h-6 text-cyan-400" />}
             color="bg-cyan-100"
@@ -242,8 +240,8 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
+      {/* Charts */}
       <div className="grid grid-cols-1 gap-6 mt-3 lg:grid-cols-12">
-        {/* Spending Trends */}
         <div className="p-6 bg-white rounded-xl shadow-xl shadow-gray-400/30 h-full lg:col-span-6">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -299,7 +297,6 @@ const Dashboard: React.FC = () => {
           </motion.div>
         </div>
 
-        {/* Spending by Category */}
         <div className="p-6 bg-white rounded-xl shadow-xl shadow-gray-400/30 h-[100svw] lg:h-full lg:col-span-6">
           <motion.div
             initial={{ opacity: 0, x: 20 }}
@@ -325,10 +322,7 @@ const Dashboard: React.FC = () => {
                 />
                 <Legend
                   height={10}
-                  wrapperStyle={{
-                    fontSize: "14px",
-                    fontWeight: "500",
-                  }}
+                  wrapperStyle={{ fontSize: "14px", fontWeight: "500" }}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -336,6 +330,7 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
+      {/* Filters */}
       <div className="p-6 bg-white rounded-xl card-shadow mt-8 mb-6">
         <div className="flex flex-wrap gap-2 items-center">
           <Funnel className="text-slate-400 h-5 w-5 " />
@@ -351,18 +346,9 @@ const Dashboard: React.FC = () => {
               </option>
             ))}
           </select>
-
           <select
             value={sortType}
-            onChange={(e) =>
-              setSortType(
-                e.target.value as
-                  | "date-newest"
-                  | "date-oldest"
-                  | "amount-high"
-                  | "amount-low"
-              )
-            }
+            onChange={(e) => setSortType(e.target.value as any)}
             className="border rounded-lg px-4 py-2 text-sm text-slate-600"
           >
             <option value="date-newest">Date (Newest)</option>
@@ -372,6 +358,8 @@ const Dashboard: React.FC = () => {
           </select>
         </div>
       </div>
+
+      {/* Expense List */}
       {filteredExpenses.length > 0 ? (
         filteredExpenses.map((e) => <ExpenseItem key={e._id} e={e} />)
       ) : (
