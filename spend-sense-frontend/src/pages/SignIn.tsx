@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { login } from "../services/auth";
+import LoginImg from "../images/login.png";
 
 type SignInForm = {
   email: string;
@@ -66,7 +67,7 @@ export default function SignIn() {
       <div className="w-full max-w-5xl bg-white rounded-3xl shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
         <div className="relative hidden md:block bg-gradient-to-b from-[#efeafd] to-[#f6f5ff] p-14">
           <img
-            src="../src/images/budget684.png"
+            src={LoginImg}
             alt="Illustration"
             className="w-full h-auto object-contain rounded-2xl"
           />
