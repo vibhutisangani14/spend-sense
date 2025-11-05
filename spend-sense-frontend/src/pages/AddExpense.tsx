@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Save, ArrowLeft, Sparkles, Check, Upload } from "lucide-react";
@@ -35,12 +35,14 @@ const AddExpense: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
-  const [receipt, setReceipt] = useState<string | null>(null); // Base64 string
+  const [receipt, setReceipt] = useState<string | null>(null);
   const [prediction, setPrediction] = useState<string | null>(null);
   const [loadingCategory, setLoadingCategory] = useState(false);
   const [predictionTimeout, setPredictionTimeout] = useState<number | null>(
     null
   );
+  const [categoryInput, setCategoryInput] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const [expense, setExpense] = useState<Expense>({
     title: "",
@@ -52,6 +54,7 @@ const AddExpense: React.FC = () => {
     userId: "",
   });
   const [user, setUser] = useState<User | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("spendsense_user");
@@ -74,17 +77,14 @@ const AddExpense: React.FC = () => {
           }),
         ]);
 
-        const categoriesData = categoryRes.data;
-        const paymentData = paymentRes.data;
+        setCategories(categoryRes.data);
+        setPaymentMethods(paymentRes.data);
 
-        setCategories(categoriesData);
-        setPaymentMethods(paymentData);
-
-        const defaultCategory = categoriesData.find(
+        const defaultCategory = categoryRes.data.find(
           (cat: Category) => cat.name.toLowerCase() === "other"
         );
-        const defaultPayment = paymentData.find(
-          (method: PaymentMethod) => method.name.toLowerCase() === "credit card"
+        const defaultPayment = paymentRes.data.find(
+          (pm: PaymentMethod) => pm.name.toLowerCase() === "credit card"
         );
 
         setExpense((prev) => ({
@@ -100,6 +100,17 @@ const AddExpense: React.FC = () => {
     };
 
     fetchData();
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleChange = async (
@@ -110,9 +121,7 @@ const AddExpense: React.FC = () => {
     const { name, value } = e.target;
     setExpense((prev) => ({ ...prev, [name]: value }));
 
-    if (predictionTimeout) {
-      clearTimeout(predictionTimeout);
-    }
+    if (predictionTimeout) clearTimeout(predictionTimeout);
 
     if (name === "title" && value.trim().length >= 3) {
       const timeout = setTimeout(async () => {
@@ -141,28 +150,31 @@ const AddExpense: React.FC = () => {
     }
   };
 
-  const handleCategoryChange = async (
-    e: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const value = e.target.value;
-    if (value === "custom") {
-      const newCategoryName = prompt("Enter a new category name:");
-      if (newCategoryName && newCategoryName.trim().length > 0) {
-        try {
-          const res = await axios.post(
-            `${import.meta.env.VITE_API_URL}/categories`,
-            { name: newCategoryName },
-            { withCredentials: true }
-          );
-          setCategories((prev) => [...prev, res.data]);
-          setExpense((prev) => ({ ...prev, categoryId: res.data._id }));
-        } catch (err) {
-          console.error("Error creating custom category:", err);
-          alert("Failed to create category. Please try again.");
-        }
-      }
-    } else {
-      setExpense((prev) => ({ ...prev, categoryId: value }));
+  const handleReceiptUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => setReceipt(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const addCustomCategory = async (name: string) => {
+    if (!name.trim()) return;
+
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/categories`,
+        { name: name.trim() },
+        { withCredentials: true }
+      );
+      setCategories((prev) => [...prev, res.data]);
+      setExpense((prev) => ({ ...prev, categoryId: res.data._id }));
+      setCategoryInput("");
+      setDropdownOpen(false);
+    } catch (err) {
+      console.error("Error adding category:", err);
+      alert("Failed to add category. Try again.");
     }
   };
 
@@ -175,61 +187,39 @@ const AddExpense: React.FC = () => {
         ...expense,
         amount: Number(expense.amount),
         userId: user._id,
-        receipt: receipt || "", // Send empty string if no receipt
+        receipt: receipt || "",
       };
-
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/expenses`,
-        payload,
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
-      );
-
-      console.log("✅ Expense added:", response.data);
+      await axios.post(`${import.meta.env.VITE_API_URL}/expenses`, payload, {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
+      });
       navigate("/app");
     } catch (err: any) {
       console.error("❌ Error adding expense:", err.response?.data || err);
     }
   };
 
-  const handleReceiptUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setReceipt(reader.result as string); // Save Base64 string
-    };
-    reader.readAsDataURL(file);
-  };
-
   if (loading) return <div className="p-6">Loading...</div>;
 
   return (
     <div className="min-h-screen bg-white py-9 px-6 flex flex-col sm:mx-18 justify-center">
-      <div className="flex flex-col items-start justify-between">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-8"
+      >
+        <button
+          type="button"
+          onClick={() => navigate("/app")}
+          className="flex items-center gap-2 text-black font-medium text-sm px-4 py-2 hover:bg-gray-100 rounded-md cursor-pointer"
         >
-          <button
-            type="button"
-            onClick={() => navigate("/app")}
-            className="flex items-center gap-2 text-black font-medium text-sm px-4 py-2 hover:bg-gray-100 rounded-md cursor-pointer"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Dashboard
-          </button>
-
-          <h1 className="text-4xl font-bold bg-[linear-gradient(135deg,#5344e5,#7c4bed,#9035ea)] bg-clip-text text-transparent my-2">
-            Add Expense
-          </h1>
-          <p className="text-gray-600">Record your spending details</p>
-        </motion.div>
-      </div>
+          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+        </button>
+        <h1 className="text-4xl font-bold bg-[linear-gradient(135deg,#5344e5,#7c4bed,#9035ea)] bg-clip-text text-transparent my-2">
+          Add Expense
+        </h1>
+        <p className="text-gray-600">Record your spending details</p>
+      </motion.div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -249,7 +239,7 @@ const AddExpense: React.FC = () => {
                 name="title"
                 value={expense.title}
                 onChange={handleChange}
-                placeholder="e.g., Starbucks coffee, Uber ride, Netflix subscription"
+                placeholder="e.g., Starbucks coffee, Uber ride"
                 required
                 className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-gray-950 text-sm focus:outline-none focus:ring-2 focus:ring-black"
               />
@@ -294,39 +284,16 @@ const AddExpense: React.FC = () => {
                       type="button"
                       className="btn bg-green-600 text-white px-3 py-1 rounded-lg text-sm flex items-center gap-1"
                       onClick={() => {
-                        const matchedCategory = categories.find(
-                          (cat) =>
-                            cat.name.toLowerCase() === prediction.toLowerCase()
+                        const match = categories.find(
+                          (c) =>
+                            c.name.toLowerCase() === prediction.toLowerCase()
                         );
-
-                        if (matchedCategory) {
-                          setExpense((prev) => ({
-                            ...prev,
-                            categoryId: matchedCategory._id,
-                          }));
-                        } else {
-                          const createCategory = async () => {
-                            try {
-                              const res = await axios.post(
-                                `${import.meta.env.VITE_API_URL}/categories`,
-                                { name: prediction },
-                                { withCredentials: true }
-                              );
-                              setCategories((prev) => [...prev, res.data]);
-                              setExpense((prev) => ({
-                                ...prev,
-                                categoryId: res.data._id,
-                              }));
-                            } catch (err) {
-                              console.error("Failed to create category", err);
-                              alert(
-                                "Failed to accept AI suggestion. Try again."
-                              );
-                            }
-                          };
-                          createCategory();
-                        }
-
+                        match
+                          ? setExpense((prev) => ({
+                              ...prev,
+                              categoryId: match._id,
+                            }))
+                          : addCustomCategory(prediction);
                         setPrediction(null);
                       }}
                     >
@@ -355,24 +322,58 @@ const AddExpense: React.FC = () => {
                 />
               </div>
 
-              <div>
+              {/* CATEGORY DROPDOWN */}
+              <div ref={dropdownRef} className="relative">
                 <label className="block text-sm font-medium mb-2">
                   Category *
                 </label>
-                <select
-                  name="categoryId"
-                  value={expense.categoryId}
-                  onChange={handleCategoryChange}
+                <input
+                  type="text"
+                  placeholder="Select a category"
+                  value={
+                    categories.find((c) => c._id === expense.categoryId)
+                      ?.name || ""
+                  }
+                  readOnly
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-gray-950 text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-400"
                   required
-                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-gray-950 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                >
-                  {categories.map((cat) => (
-                    <option key={cat._id} value={cat._id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                  <option value="custom">➕ Add Custom Category</option>
-                </select>
+                />
+                {dropdownOpen && (
+                  <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto">
+                    {categories.map((cat) => (
+                      <div
+                        key={cat._id}
+                        className="px-4 py-2 hover:bg-indigo-100 cursor-pointer"
+                        onClick={() => {
+                          setExpense((prev) => ({
+                            ...prev,
+                            categoryId: cat._id,
+                          }));
+                          setDropdownOpen(false);
+                        }}
+                      >
+                        {cat.name}
+                      </div>
+                    ))}
+                    <div className="flex gap-2 px-4 py-2 border-t border-gray-200">
+                      <input
+                        type="text"
+                        value={categoryInput}
+                        onChange={(e) => setCategoryInput(e.target.value)}
+                        placeholder="Add new category"
+                        className="flex-1 border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm"
+                      />
+                      <button
+                        type="button"
+                        className="bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] text-white px-3 py-1 rounded-lg  transition text-sm font-semibold"
+                        onClick={() => addCustomCategory(categoryInput)}
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -389,7 +390,6 @@ const AddExpense: React.FC = () => {
                   className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-gray-950 text-sm focus:outline-none focus:ring-2 focus:ring-black"
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium mb-2">
                   Payment Method
@@ -400,9 +400,9 @@ const AddExpense: React.FC = () => {
                   onChange={handleChange}
                   className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-gray-950 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
                 >
-                  {paymentMethods.map((method) => (
-                    <option key={method._id} value={method._id}>
-                      {method.name}
+                  {paymentMethods.map((pm) => (
+                    <option key={pm._id} value={pm._id}>
+                      {pm.name}
                     </option>
                   ))}
                 </select>
@@ -414,11 +414,11 @@ const AddExpense: React.FC = () => {
               <label className="block text-sm font-medium mb-2">Notes</label>
               <textarea
                 name="notes"
+                value={expense.notes}
+                onChange={handleChange}
                 placeholder="Add any additional details..."
                 className="w-full border border-gray-200 rounded-lg px-4 py-2.5 bg-[#f9f9fa] text-sm focus:outline-none focus:ring-2 focus:ring-black"
                 rows={3}
-                value={expense.notes}
-                onChange={handleChange}
               />
             </div>
 
@@ -431,18 +431,8 @@ const AddExpense: React.FC = () => {
                 htmlFor="receipt-upload"
                 className="flex items-center justify-center gap-2 border border-gray-200 rounded-lg px-4 py-3 bg-[#f9f9fa] text-sm text-gray-700 cursor-pointer hover:border-indigo-500 hover:text-indigo-600 transition-all"
               >
-                {receipt ? (
-                  <>
-                    <Upload className="w-4 h-4 text-gray-600" />
-                    <span>Receipt Selected</span>
-                  </>
-                ) : (
-                  <>
-                    <Upload className="w-4 h-4 text-gray-600" />
-                    <span>Upload Receipt</span>
-                  </>
-                )}
-
+                <Upload className="w-4 h-4 text-gray-600" />
+                <span>{receipt ? "Receipt Selected" : "Upload Receipt"}</span>
                 <input
                   id="receipt-upload"
                   type="file"
@@ -451,15 +441,14 @@ const AddExpense: React.FC = () => {
                   className="hidden"
                 />
               </label>
-
               {receipt && (
                 <motion.p
                   initial={{ opacity: 0, y: -4 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="text-xs text-green-600 font-medium mt-2 flex items-center gap-1"
                 >
-                  <Check className="w-3 h-3 text-green-600" />
-                  Receipt added successfully
+                  <Check className="w-3 h-3 text-green-600" /> Receipt added
+                  successfully
                 </motion.p>
               )}
             </div>
@@ -477,8 +466,7 @@ const AddExpense: React.FC = () => {
                 type="submit"
                 className="w-full bg-[linear-gradient(135deg,#6762f1,#7c4bed,#9035ea)] flex items-center justify-center gap-2 text-sm text-white font-semibold py-2.5 rounded-lg hover:opacity-90 transition"
               >
-                <Save className="w-4 h-4" />
-                Save Expense
+                <Save className="w-4 h-4" /> Save Expense
               </button>
             </div>
           </form>

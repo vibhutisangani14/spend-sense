@@ -67,7 +67,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
       </div>
 
       {/* Navigation */}
-      <nav className="p-4 flex flex-col gap-3">
+      <nav className="p-4 flex flex-col">
         <NavLink
           to="/app"
           end

@@ -107,26 +107,32 @@ export default function ChatWithAI() {
               about your expenses. What would you like to know?
             </motion.div>
           </div>
-
-          {/* Suggested questions */}
-          {showSuggestions && (
-            <div>
-              <p className="text-sm text-gray-500 font-medium py-2 mb-1">
-                Try asking:
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {suggestedQuestions.map((q, i) => (
-                  <button
-                    key={i}
-                    onClick={() => handleAsk(q)}
-                    className="border border-gray-200 hover:bg-blue-100 text-sm font-semibold bg-[#f9f9fa] text-black px-3 py-2 rounded-md transition"
-                  >
-                    {q}
-                  </button>
-                ))}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="mt-6"
+          >
+            {/* Suggested questions */}
+            {showSuggestions && (
+              <div>
+                <p className="text-sm text-gray-500 font-medium py-2 mb-1">
+                  Try asking:
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {suggestedQuestions.map((q, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleAsk(q)}
+                      className="border border-gray-200 hover:bg-blue-100 text-sm font-semibold bg-[#f9f9fa] text-black px-3 py-2 rounded-md transition"
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </motion.div>
 
           {messages.map((msg, i) => (
             <div

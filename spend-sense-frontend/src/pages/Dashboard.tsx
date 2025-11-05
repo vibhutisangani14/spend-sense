@@ -24,6 +24,7 @@ import {
   YAxis,
   CartesianGrid,
 } from "recharts";
+import type { PieLabelRenderProps } from "recharts";
 import { fetchExpenses, fetchCategories } from "../api/expenseApi";
 
 const COLORS = [
@@ -311,7 +312,13 @@ const Dashboard: React.FC = () => {
                   dataKey="value"
                   nameKey="name"
                   outerRadius={90}
-                  label
+                  labelLine={false}
+                  label={(props: PieLabelRenderProps) => {
+                    const { value } = props;
+                    return typeof value === "number"
+                      ? `€${value.toFixed(2)}`
+                      : null;
+                  }}
                 >
                   {pieData.map((entry, index) => (
                     <Cell key={entry.name + index} fill={entry.color} />
